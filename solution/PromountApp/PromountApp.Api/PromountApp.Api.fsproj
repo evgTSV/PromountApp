@@ -25,6 +25,7 @@
       <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.11.0-beta.1" />
       <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.1" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+      <PackageReference Update="FSharp.Core" Version="9.0.201" />
     </ItemGroup>
 
 </Project>
