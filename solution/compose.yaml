@@ -1,0 +1,19 @@
+﻿version: '3.1'
+
+services:
+  web:
+    image: promountweb
+    build:
+      context: PromountApp/PromountApp.Api
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "80:8080"
+    env_file:
+      - .env
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
