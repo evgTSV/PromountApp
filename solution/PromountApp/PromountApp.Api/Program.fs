@@ -1,36 +1,72 @@
-namespace PromountApp
+namespace PromountApp.Api
 #nowarn "20"
-open System
-open System.Collections.Generic
-open System.IO
-open System.Linq
-open System.Threading.Tasks
-open Microsoft.AspNetCore
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
-open Microsoft.AspNetCore.HttpsPolicy
-open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
-open Microsoft.Extensions.Logging
+open Giraffe
+open Giraffe.EndpointRouting
+open Npgsql
+open OpenTelemetry.Metrics
 
-module Program =
-    let exitCode = 0
+module Program =   
+    let endpoints =
+        [
+            GET [
+                route "/ping" (text "pong")
+            ]
+        ]
+        
+    let configureOTel (services:IServiceCollection) =
+        let histogram = ExplicitBucketHistogramConfiguration()
+        histogram.Boundaries <- [| 0; 0.005; 0.01; 0.025; 0.05; 0.075; 0.1; 0.25; 0.5; 0.75; 1; 2.5; 5; 7.5; 10 |]
+        services.AddOpenTelemetry()
+            .WithMetrics(fun builder ->
+                builder
+                    .AddPrometheusExporter()
+                    .AddRuntimeInstrumentation()
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddNpgsqlInstrumentation()
+                    .AddProcessInstrumentation()
+                    .AddMeter(
+                           "Microsoft.AspNetCore.Hosting",
+                           "Microsoft.AspNetCore.Server.Kestrel",
+                           "Microsoft.AspNetCore.Http.Connections",
+                           "Microsoft.AspNetCore.Routing",
+                           "Microsoft.AspNetCore.Diagnostics",
+                           "Microsoft.AspNetCore.RateLimiting"
+                           )
+                    .AddView("request-duration", histogram)
+                |> ignore)
+    
+    let configureServices (services:IServiceCollection) =
+        configureOTel services
+        services
+            .AddRouting()
+            .AddGiraffe()
+            .AddEndpointsApiExplorer()
+            .AddSwaggerGen()
+        |> ignore
+        
+    let configureApp (appBuilder : IApplicationBuilder) =
+        appBuilder
+            .UseRouting()
+            .UseOpenTelemetryPrometheusScrapingEndpoint()
+            .UseSwagger()
+            .UseSwaggerUI()
+            .UseGiraffe(endpoints)
+        |> ignore
 
     [<EntryPoint>]
-    let main args =
-
-        let builder = WebApplication.CreateBuilder(args)
-
-        builder.Services.AddControllers()
-
-        let app = builder.Build()
-
-        app.UseHttpsRedirection()
-
-        app.UseAuthorization()
-        app.MapControllers()
-
-        app.Run()
-
-        exitCode
+    let main _ =
+        Host.CreateDefaultBuilder()
+            .ConfigureWebHostDefaults(
+                fun webHostBuilder ->
+                    webHostBuilder
+                        .Configure(configureApp)
+                        .ConfigureServices(configureServices)
+                    |> ignore)
+            .Build()
+            .Run()
+        0

@@ -13,6 +13,31 @@ services:
       - .env
     networks:
       - mynetwork
+        
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - mynetwork
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - mynetwork
 
 networks:
   mynetwork:
