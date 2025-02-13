@@ -4,6 +4,14 @@ open System
 open System.ComponentModel.DataAnnotations
 open FSharp.Data.Validator
 
+[<CLIMutable>]
+type Day = {
+    current_date: int
+} with
+    interface IValidatable with
+        member this.Validate() =
+            this.current_date |> inRange (0, TimeSpan.MaxValue.Days)
+
 type Gender = MALE = 0 | FEMALE = 1
 
 [<CLIMutable>]

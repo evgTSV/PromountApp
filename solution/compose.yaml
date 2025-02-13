@@ -7,6 +7,11 @@ services:
       context: PromountApp/PromountApp.Api
       dockerfile: Dockerfile
     restart: always
+    depends_on:
+      - db
+      - redis
+      - prometheus
+      - grafana
     ports:
       - "80:8080"
     env_file:
@@ -25,7 +30,34 @@ services:
       - "5432:5432"
     networks:
       - mynetwork
+      
+  redis:
+    image: redis:latest
+    restart: always
+    volumes:
+      - ./redisdata:/data
+    environment:
+      REDIS_URL: redis:6379
+    ports:
+      - "6379:6379"
+    networks:
+      - mynetwork
         
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    restart: always
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - mynetwork
+
   prometheus:
     image: prom/prometheus:latest
     restart: always
@@ -35,19 +67,6 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-    networks:
-      - mynetwork
-
-  grafana:
-    image: grafana/grafana:latest
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    restart: always
-    ports:
-      - 3000:3000
-    volumes:
-      - ./grafana:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
     networks:
       - mynetwork
 

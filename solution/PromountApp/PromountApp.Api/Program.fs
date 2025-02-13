@@ -39,6 +39,12 @@ module Program =
     let updateDatabase (serviceProvider: IServiceProvider) =
         let runner = serviceProvider.GetRequiredService<IMigrationRunner>()
         runner.MigrateUp()
+        
+    let configureRedis (services: IServiceCollection)=
+        services
+            .AddStackExchangeRedisCache(fun options ->
+                options.Configuration <- "redis:6379"
+            ) |> ignore
     
     let configureOTel (services: IServiceCollection) =
         let histogram = ExplicitBucketHistogramConfiguration()
@@ -76,8 +82,10 @@ module Program =
         configureDB services
         updateDatabase ((configureMigration services)
                             .CreateScope().ServiceProvider)
+        configureRedis services
         configureOTel services
         services
+            .AddSingleton<TimeConfig>()
             .AddScoped<IClientsService, ClientsService>()
             .AddScoped<IAdvertisersService, AdvertisersService>()
             .AddRouting()
