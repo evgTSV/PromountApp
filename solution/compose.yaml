@@ -13,6 +13,18 @@ services:
       - .env
     networks:
       - mynetwork
+      
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: promountDB
+    ports:
+      - "5432:5432"
+    networks:
+      - mynetwork
         
   prometheus:
     image: prom/prometheus:latest
