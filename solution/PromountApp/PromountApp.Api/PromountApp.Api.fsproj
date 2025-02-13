@@ -28,6 +28,7 @@
       <PackageReference Include="EFCore.BulkExtensions" Version="9.0.0-rc.1" />
       <PackageReference Include="FluentMigrator" Version="6.2.0" />
       <PackageReference Include="FluentMigrator.Runner" Version="6.2.0" />
+      <PackageReference Include="FSharp.Data.Validator" Version="9.0.2" />
       <PackageReference Include="Grafana.OpenTelemetry" Version="1.2.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">

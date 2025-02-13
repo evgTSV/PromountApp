@@ -16,6 +16,7 @@ open OpenTelemetry.Metrics
 open PromountApp.Api.Services
 open PromountApp.Api.Utils
 open PromountApp.Api.Migrations
+open PromountApp.Api.Validation
 
 module Program =
     let configureDB (services: IServiceCollection) =
@@ -82,7 +83,9 @@ module Program =
             .AddRouting()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen()
-            .AddControllers()
+            .AddControllers(fun config ->
+                config.Filters.Add<ValidateModelFilter>() |> ignore
+            )
             .AddJsonOptions(configureJsonOption)
         |> ignore
         
