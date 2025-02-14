@@ -18,10 +18,10 @@ type AddCampaignsTable() =
             .WithColumn("ad_text").AsString().NotNullable()
             .WithColumn("start_date").AsInt32().NotNullable()
             .WithColumn("end_date").AsInt32().NotNullable()
-            .WithColumn("gender").AsString()
-            .WithColumn("age_from").AsInt32()
-            .WithColumn("age_to").AsInt32()
-            .WithColumn("location").AsString() |> ignore
+            .WithColumn("gender").AsString().Nullable()
+            .WithColumn("age_from").AsInt32().Nullable()
+            .WithColumn("age_to").AsInt32().Nullable()
+            .WithColumn("location").AsString().Nullable() |> ignore
 
     override _.Down() =
         base.Delete.Table("Campaigns") |> ignore

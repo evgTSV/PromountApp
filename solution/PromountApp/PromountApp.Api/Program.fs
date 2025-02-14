@@ -77,6 +77,10 @@ module Program =
         opts.DefaultIgnoreCondition <- JsonIgnoreCondition.WhenWritingNull
         opts.WriteIndented <- true)
 
+    let configureServiceLocator (services: IServiceCollection) =
+        ServiceLocator.SetProvider(
+            services
+                .BuildServiceProvider())
     
     let configureServices (services: IServiceCollection) =
         configureDB services
@@ -88,6 +92,7 @@ module Program =
             .AddSingleton<TimeConfig>()
             .AddScoped<IClientsService, ClientsService>()
             .AddScoped<IAdvertisersService, AdvertisersService>()
+            .AddScoped<ICampaignsService, CampaignsService>()
             .AddRouting()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen()
@@ -95,7 +100,8 @@ module Program =
                 config.Filters.Add<ValidateModelFilter>() |> ignore
             )
             .AddJsonOptions(configureJsonOption)
-        |> ignore
+        |> ignore        
+        configureServiceLocator services
         
     let configureApp (appBuilder: IApplicationBuilder) =
         appBuilder

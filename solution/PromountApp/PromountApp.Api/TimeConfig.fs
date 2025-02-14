@@ -12,3 +12,5 @@ type TimeConfig(cache: IDistributedCache) =
         and set (v : TimeSpan) =
             let dateStr = v.TotalDays.ToString()
             cache.SetString(cacheTimeKey, dateStr)
+            
+    member this.GetTotalDays() = this.CurrentTime.TotalDays |> int

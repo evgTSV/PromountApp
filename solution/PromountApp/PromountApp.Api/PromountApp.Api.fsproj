@@ -18,10 +18,12 @@
       <Compile Include="Services\PromountContext.fs" />
       <Compile Include="Services\ClientsService.fs" />
       <Compile Include="Services\AdvertisersService.fs" />
+      <Compile Include="Services\CampaignsService.fs" />
       <Compile Include="Controllers\ClientsController.fs" />
       <Compile Include="Controllers\AdvertisersController.fs" />
       <Compile Include="Controllers\TimeController.fs" />
       <Compile Include="Controllers\MLScoresController.fs" />
+      <Compile Include="Controllers\CampaignsController.fs" />
       <Compile Include="Migrations\AddCampaignTable.fs" />
       <Compile Include="Migrations\AddMLScoreTable.fs" />
       <Compile Include="Migrations\AddAdvertisersTable.fs" />
@@ -31,6 +33,7 @@
 
     <ItemGroup>
       <PackageReference Include="EFCore.BulkExtensions" Version="9.0.0-rc.1" />
+      <PackageReference Include="EFCore.BulkExtensions.PostgreSql" Version="9.0.0" />
       <PackageReference Include="FluentMigrator" Version="6.2.0" />
       <PackageReference Include="FluentMigrator.Runner" Version="6.2.0" />
       <PackageReference Include="FSharp.Data.Validator" Version="9.0.2" />
