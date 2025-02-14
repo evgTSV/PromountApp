@@ -11,6 +11,7 @@ open PromountApp.Api.Utils
 type IAdvertisersService =
     abstract member GetAdvertiser: Guid -> Async<ServiceResponse<Advertiser>>
     abstract member BulkInsertion: Advertiser seq -> Async<ServiceResponse<unit>>
+    abstract member SetMLScore: MLScore -> Async<ServiceResponse<unit>>
     
 type AdvertisersService(dbContext: PromountContext) =
     interface IAdvertisersService with
@@ -38,4 +39,20 @@ type AdvertisersService(dbContext: PromountContext) =
                 return Success()
             else
                 return Conflict
+        }
+        
+        member this.SetMLScore(mlScore: MLScore) = async {
+            let! isExisting = 
+                dbContext.MLScores
+                    .AnyAsync(fun m -> m.client_id = mlScore.client_id && m.advertiser_id = mlScore.advertiser_id)
+                    |> Async.AwaitTask
+            
+            if isExisting then
+                dbContext.Update(mlScore) |> ignore
+                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
+                return Success()
+            else
+                let! _ = dbContext.AddAsync(mlScore).AsTask() |> Async.AwaitTask
+                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
+                return Success()
         }

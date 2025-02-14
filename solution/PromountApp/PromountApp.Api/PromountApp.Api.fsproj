@@ -21,6 +21,9 @@
       <Compile Include="Controllers\ClientsController.fs" />
       <Compile Include="Controllers\AdvertisersController.fs" />
       <Compile Include="Controllers\TimeController.fs" />
+      <Compile Include="Controllers\MLScoresController.fs" />
+      <Compile Include="Migrations\AddCampaignTable.fs" />
+      <Compile Include="Migrations\AddMLScoreTable.fs" />
       <Compile Include="Migrations\AddAdvertisersTable.fs" />
       <Compile Include="Migrations\AddClientsTable.fs" />
       <Compile Include="Program.fs" />

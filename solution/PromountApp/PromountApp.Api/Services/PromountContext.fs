@@ -13,9 +13,20 @@ type PromountContext(options: DbContextOptions<PromountContext>) =
     [<DefaultValue>]
     val mutable private advertisers: DbSet<Advertiser>
     member this.Advertisers with get() = this.advertisers and set v = this.advertisers <- v
+    
+    [<DefaultValue>]
+    val mutable private mlScores: DbSet<MLScore>
+    member this.MLScores with get() = this.mlScores and set v = this.mlScores <- v
+    
+    [<DefaultValue>]
+    val mutable private campaigns: DbSet<CampaignDb>
+    member this.Campaigns with get() = this.campaigns and set v = this.campaigns <- v
         
     override this.OnModelCreating builder =
-        ()
+        builder
+            .Entity<MLScore>()
+            .HasKey("client_id", "advertiser_id") |> ignore
+        base.OnModelCreating(builder)
         
     override this.OnConfiguring(options: DbContextOptionsBuilder) : unit =
         options.UseNpgsql(fun builder ->
