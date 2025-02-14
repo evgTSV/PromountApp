@@ -39,3 +39,53 @@ dotnet test PromountApp/PromountApp.Api.Tests
 > 
 > Если при просмотре дешбордов отображается ``No data``, то необходимо вручную импортировать дешборды из ``grafana/provisioning/dashboards/``
 > В качестве провайдера указать ``promethous``
+
+### Схема отношений моделей СУБД
+(для отображения необходима поддержка Mermaid)
+```mermaid
+erDiagram
+    CLIENT {
+        Guid client_id
+        string login
+        int age
+        string location
+        string gender
+    }
+    ADVERTISER {
+        Guid advertiser_id
+        string name
+    }
+    MLSCORE {
+        Guid client_id
+        Guid advertiser_id
+        int score
+    }
+    TARGETING {
+        string gender
+        int age_from
+        int age_to
+        string location
+    }
+    CAMPAIGN {
+        Guid campaign_id
+        Guid advertiser_id
+        int impressions_limit
+        int clicks_limit
+        float cost_per_impression
+        float cost_per_click
+        string ad_title
+        string ad_text
+        int start_date
+        int end_date
+        string gender
+        int age_from
+        int age_to
+        string location
+    }
+    
+    CLIENT ||--o{ MLSCORE : has
+    ADVERTISER ||--o{ MLSCORE : has
+    ADVERTISER ||--o{ CAMPAIGN : runs
+    CAMPAIGN ||--|{ TARGETING : includes
+
+```
