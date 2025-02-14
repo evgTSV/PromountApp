@@ -61,10 +61,10 @@ erDiagram
         int score
     }
     TARGETING {
-        string gender
-        int age_from
-        int age_to
-        string location
+        Nullable~string~ gender
+        Nullable~int~ age_from
+        Nullable~int~ age_to
+        Nullable~string~ location
     }
     CAMPAIGN {
         Guid campaign_id
