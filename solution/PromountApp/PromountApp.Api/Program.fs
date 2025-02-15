@@ -17,6 +17,8 @@ open PromountApp.Api.Services
 open PromountApp.Api.Utils
 open PromountApp.Api.Migrations
 open PromountApp.Api.Validation
+open Serilog
+open Serilog.Sinks.Grafana.Loki
 
 module Program =
     let configureDB (services: IServiceCollection) =
@@ -68,6 +70,15 @@ module Program =
                     .AddView("request-duration", histogram)
                 |> ignore)
             
+    let configureLogger (services: IServiceCollection) =
+        Log.Logger <- LoggerConfiguration()
+            .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+            .Enrich.FromLogContext()
+            .WriteTo.GrafanaLoki("http://loki:3100")
+            .WriteTo.Console()
+            .CreateLogger()
+        services.AddLogging(fun builder -> builder.AddSerilog(dispose = true) |> ignore) |> ignore
+            
     let configureJsonOption=
         Action<JsonOptions>(fun options ->
         let opts = options.JsonSerializerOptions
@@ -88,6 +99,7 @@ module Program =
                             .CreateScope().ServiceProvider)
         configureRedis services
         configureOTel services
+        configureLogger services
         services
             .AddSingleton<TimeConfig>()
             .AddScoped<IClientsService, ClientsService>()
@@ -116,6 +128,7 @@ module Program =
     [<EntryPoint>]
     let main _ =
         Host.CreateDefaultBuilder()
+            .UseSerilog()
             .ConfigureWebHostDefaults(
                 fun webHostBuilder ->
                     webHostBuilder

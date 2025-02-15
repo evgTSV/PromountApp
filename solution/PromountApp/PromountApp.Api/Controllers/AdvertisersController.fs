@@ -23,7 +23,7 @@ type AdvertisersController(advertisersService: IAdvertisersService) =
     [<HttpPost("bulk")>]
     member this.BulkCopy([<FromBody>] advertisers: Advertiser seq) = task {
         match! advertisersService.BulkInsertion(advertisers) with
-        | Success _ -> return CreatedResult() :> IActionResult
+        | Success _ -> return OkObjectResult(advertisers, StatusCode = 201) :> IActionResult
         | Conflict -> return ConflictResult() :> IActionResult
         | _ -> return failwith "Internal Error"
     }

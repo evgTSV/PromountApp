@@ -1,11 +1,8 @@
 ﻿apiVersion: 1
 
 providers:
-  - name: 'default'
-    orgId: 1
-    folder: ''
+  - name: dashboards
     type: file
-    disableDeletion: true
-    updateIntervalSeconds: 10
+    updateIntervalSeconds: 30
     options:
-      path: /var/lib/grafana/dashboards
+      path: /var/lib/grafana/provisioning/dashboards

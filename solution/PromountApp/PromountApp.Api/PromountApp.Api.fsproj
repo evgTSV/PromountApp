@@ -33,7 +33,6 @@
 
     <ItemGroup>
       <PackageReference Include="EFCore.BulkExtensions" Version="9.0.0-rc.1" />
-      <PackageReference Include="EFCore.BulkExtensions.PostgreSql" Version="9.0.0" />
       <PackageReference Include="FluentMigrator" Version="6.2.0" />
       <PackageReference Include="FluentMigrator.Runner" Version="6.2.0" />
       <PackageReference Include="FSharp.Data.Validator" Version="9.0.2" />
@@ -50,6 +49,8 @@
       <PackageReference Include="Npgsql.OpenTelemetry" Version="9.0.2" />
       <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.11.0-beta.1" />
       <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.1" />
+      <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+      <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.3.0" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
       <PackageReference Update="FSharp.Core" Version="9.0.201" />
     </ItemGroup>

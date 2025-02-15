@@ -23,7 +23,7 @@ type ClientsController(clientsService: IClientsService) =
     [<HttpPost("bulk")>]
     member this.BulkCopy([<FromBody>] clients: Client seq) = task {
         match! clientsService.BulkInsertion(clients) with
-        | Success _ -> return CreatedResult() :> IActionResult
+        | Success _ -> return OkObjectResult(clients, StatusCode = 201) :> IActionResult
         | Conflict -> return ConflictResult() :> IActionResult
         | _ -> return failwith "Internal Error"
     }

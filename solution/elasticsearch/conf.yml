@@ -1,0 +1,8 @@
+﻿network :
+  host : 0.0.0.0
+
+# Только в среде разработки
+cluster.name: opentrace
+xpack.security.enabled: false
+xpack.security.transport.ssl.enabled: false
+xpack.security.http.ssl.enabled: false

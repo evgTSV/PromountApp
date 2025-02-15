@@ -3,8 +3,31 @@
 datasources:
   - name: Prometheus
     type: prometheus
+    uid: provisioned-prometheus-datasource
     access: proxy
     url: http://prometheus:9090
     isDefault: true
     jsonData:
       timeInterval: 10s
+  - name: Loki
+    type: loki
+    uid: provisioned-loki-datasource
+    access: proxy
+    url: http://loki:3100
+    jsonData:
+      maxLines: 1000
+  - name: Jaeger
+    type: jaeger
+    uid: provisioned-jaeger-datasource
+    url: http://jaeger:16686
+    access: proxy
+  - name: ElasticSearch
+    type: elasticsearch
+    uid: provisioned-elasticsearch-datasource
+    url: http://elasticsearch:9200
+    access: proxy
+    jsonData:
+      timeField: startTimeMillis
+      interval: Daily
+      maxConcurrentShardRequests: 5
+      index: "[jaeger-span-]YYYY-MM-DD"
