@@ -16,7 +16,7 @@ type ClientsController(clientsService: IClientsService) =
     member this.Get(id: Guid) = task {
         match! clientsService.GetClient(id) with
         | Success client -> return OkObjectResult(client) :> IActionResult
-        | NotFounded -> return NotFoundResult() :> IActionResult
+        | NotFound -> return NotFoundResult() :> IActionResult
         | _ -> return failwith "Internal Error"
     }
         

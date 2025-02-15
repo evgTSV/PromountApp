@@ -16,7 +16,7 @@ type AdvertisersController(advertisersService: IAdvertisersService) =
     member this.Get(id: Guid) = task {
         match! advertisersService.GetAdvertiser(id) with
         | Success advertiser -> return OkObjectResult(advertiser) :> IActionResult
-        | NotFounded -> return NotFoundResult() :> IActionResult
+        | NotFound -> return NotFoundResult() :> IActionResult
         | _ -> return failwith "Internal Error"
     }
         

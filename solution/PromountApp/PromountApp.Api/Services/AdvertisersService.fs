@@ -21,7 +21,7 @@ type AdvertisersService(dbContext: PromountContext) =
                 return Success advertiser
             with
             | :? AggregateException as agg ->
-                return filterAggregate (fun _ -> NotFounded)
+                return filterAggregate (fun _ -> NotFound)
                            agg [| InvalidOperationException() |]
         }
             

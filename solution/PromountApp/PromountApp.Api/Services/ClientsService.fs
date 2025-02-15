@@ -20,7 +20,7 @@ type ClientsService(dbContext: PromountContext) =
                 return Success client
             with
             | :? AggregateException as agg ->
-                return filterAggregate (fun _ -> NotFounded)
+                return filterAggregate (fun _ -> NotFound)
                            agg [| InvalidOperationException() |]
         }
             

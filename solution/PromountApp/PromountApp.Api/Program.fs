@@ -86,7 +86,8 @@ module Program =
         opts.Encoder <- System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         opts.PropertyNamingPolicy <- JsonNamingPolicy.SnakeCaseLower
         opts.DefaultIgnoreCondition <- JsonIgnoreCondition.WhenWritingNull
-        opts.WriteIndented <- true)
+        opts.WriteIndented <- true
+        opts.NumberHandling <- JsonNumberHandling.AllowNamedFloatingPointLiterals)
 
     let configureServiceLocator (services: IServiceCollection) =
         ServiceLocator.SetProvider(
@@ -105,6 +106,7 @@ module Program =
             .AddScoped<IClientsService, ClientsService>()
             .AddScoped<IAdvertisersService, AdvertisersService>()
             .AddScoped<ICampaignsService, CampaignsService>()
+            .AddScoped<IStatisticsService, StatisticsService>()
             .AddRouting()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen()

@@ -12,7 +12,7 @@ type TimeController(timeConfig: TimeConfig) =
     
     [<HttpGet("current-time")>]
     member this.GetCurrentTime() =
-        try          
+        try    
             OkObjectResult({|current_date = timeConfig.CurrentTime.TotalDays|}) :> IActionResult
         with
         | ex -> failwith $"Error: {ex.Message}" :> IActionResult
@@ -21,10 +21,11 @@ type TimeController(timeConfig: TimeConfig) =
     member this.Advance([<FromBody>] day: Day) =
         try
             let current_day = day.current_date
-            let date = TimeSpan.FromDays(current_day)
-            
-            timeConfig.CurrentTime <- date
-            
-            OkObjectResult({|current_date = timeConfig.CurrentTime.TotalDays|}) :> IActionResult
+            if timeConfig.GetTotalDays() <= day.current_date then
+                let date = TimeSpan.FromDays(current_day)
+                timeConfig.CurrentTime <- date
+                OkObjectResult({|current_date = timeConfig.CurrentTime.TotalDays|}) :> IActionResult
+            else
+                BadRequestResult() :> IActionResult
         with
         | ex -> failwith $"Error: {ex.Message}" :> IActionResult

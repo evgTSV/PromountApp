@@ -19,7 +19,7 @@ type CampaignsController(campaignsService: ICampaignsService) =
         match! campaignsService.CreateCampaign(campaign) with
         | Success campaign ->
             return OkObjectResult(campaign, StatusCode = 201) :> IActionResult
-        | NotFounded ->
+        | NotFound ->
             return NotFoundResult() :> IActionResult
         | _ ->
             return failwith "Internal Error"
@@ -35,7 +35,7 @@ type CampaignsController(campaignsService: ICampaignsService) =
         | Success (campaigns, count) ->
             this.Response.Headers["X-Total-Count"] <- count.ToString()
             return OkObjectResult(campaigns) :> IActionResult
-        | NotFounded ->
+        | NotFound ->
             return NotFoundResult() :> IActionResult
         | _ ->
             return failwith "Internal Error"
@@ -47,7 +47,7 @@ type CampaignsController(campaignsService: ICampaignsService) =
         match! campaignsService.GetCampaign advertiserId campaignId with
         | Success campaign ->
             return OkObjectResult(campaign) :> IActionResult
-        | NotFounded ->
+        | NotFound ->
             return NotFoundResult() :> IActionResult
         | _ ->
             return failwith "Internal Error"
@@ -60,7 +60,7 @@ type CampaignsController(campaignsService: ICampaignsService) =
         match! campaignsService.UpdateCampaign advertiserId campaign with
         | Success campaign ->
             return OkObjectResult(campaign) :> IActionResult
-        | NotFounded ->
+        | NotFound ->
             return NotFoundResult() :> IActionResult
         | Conflict ->
             return BadRequestResult() :> IActionResult
@@ -73,7 +73,7 @@ type CampaignsController(campaignsService: ICampaignsService) =
         match! campaignsService.DeleteCampaign advertiserId campaignId with
         | Success _ ->
             return NoContentResult() :> IActionResult
-        | NotFounded ->
+        | NotFound ->
             return NotFoundResult() :> IActionResult
         | _ ->
             return failwith "Internal Error"

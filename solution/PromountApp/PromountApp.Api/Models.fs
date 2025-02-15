@@ -101,7 +101,11 @@ type Campaign = {
     interface IValidatable with
         member this.Validate() =
             let timeService = ServiceLocator.GetService<TimeConfig>()
-            this.ad_title |> requiresTextLength (0, 200)
+            this.impressions_limit > 0 && this.impressions_limit >= this.clicks_limit
+            && this.clicks_limit > 0
+            && this.cost_per_click > 0
+            && this.cost_per_impression > 0
+            && this.ad_title |> requiresTextLength (0, 200)
             && this.ad_text |> requiresTextLength (0, 5000)
             && this.start_date |> (inRange (0, TimeSpan.MaxValue.TotalDays |> int)
                     |&&| (<=) (timeService.CurrentTime.TotalDays |> int))
@@ -204,7 +208,11 @@ type CampaignUpdate = {
         member this.Validate() =
             let timeService = ServiceLocator.GetService<TimeConfig>()
             let totalDays = timeService.GetTotalDays()
-            this.ad_title |> validateOption' (requiresTextLength (0, 200))
+            this.impressions_limit |> validateOptionV ((<) 0) 
+            && this.clicks_limit |> validateOptionV ((<) 0)
+            && this.cost_per_click |> validateOptionV ((<) 0)
+            && this.cost_per_impression |> validateOptionV ((<) 0)
+            && this.ad_title |> validateOption' (requiresTextLength (0, 200))
             && this.ad_text |> validateOption' (requiresTextLength (0, 5000))
             && this.start_date |> validateOptionV (inRange (0, TimeSpan.MaxValue.TotalDays |> int)
                     |&&| (<=) totalDays)
@@ -212,16 +220,17 @@ type CampaignUpdate = {
                     |&&| (<=) totalDays)
             && ((this.start_date.HasValue && this.end_date.HasValue) |> not
                 || this.start_date.Value <= this.end_date.Value)
+            && ((this.impressions_limit.HasValue && this.clicks_limit.HasValue) |> not
+                || this.impressions_limit.Value >= this.clicks_limit.Value)
             && this.targeting |> validateOption' (fun t -> (t :> IValidatable).Validate())
 
 [<CLIMutable>]
-type Stats = {
-    impressions_count: int
-    clicks_count: int
-    conversion: float
-    spent_impressions: float
-    spent_clicks: float
-    spent_total: float
+type Ad = {
+    [<Key>]
+    ad_id: Guid
+    ad_title: string
+    ad_text: string
+    advertiser_id: Guid
 }
 
 [<CLIMutable>]
@@ -233,4 +242,49 @@ type DailyStats = {
     spent_clicks: float
     spent_total: float
     date: int
+}
+
+[<CLIMutable>]
+type Stats = {
+    impressions_count: int
+    clicks_count: int
+    conversion: float
+    spent_impressions: float
+    spent_clicks: float
+    spent_total: float
+} with
+    member this.ToDaily (day: int) = {
+        impressions_count = this.impressions_count
+        clicks_count = this.clicks_count
+        conversion = this.conversion
+        spent_impressions = this.spent_impressions
+        spent_clicks = this.spent_clicks
+        spent_total = this.spent_total
+        date = day
+    }       
+
+[<CLIMutable>]
+type Click = {
+    [<Required>]
+    client_id: Guid
+}
+
+[<CLIMutable>]
+type ImpressionLog = {
+    [<Key>]
+    id: Guid
+    client_id: Guid
+    campaign_id: Guid
+    cost: float
+    timestamp: int
+}
+
+[<CLIMutable>]
+type ClickLog = {
+    [<Key>]
+    id: Guid
+    client_id: Guid
+    campaign_id: Guid
+    cost: float
+    timestamp: int
 }

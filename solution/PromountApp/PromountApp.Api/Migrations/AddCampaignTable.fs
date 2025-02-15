@@ -1,4 +1,4 @@
-﻿module PromountApp.Api.Migrations.AddCampaignTable
+﻿namespace PromountApp.Api.Migrations
 
 open FluentMigrator
 

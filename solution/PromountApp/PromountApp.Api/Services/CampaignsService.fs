@@ -31,7 +31,7 @@ type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertise
                 let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
                 return Success campaign
             else
-                return NotFounded
+                return NotFound
         }
         
         member this.GetAllCampaigns advertiserId (size, page) = async {
@@ -48,7 +48,7 @@ type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertise
                 
                 return Success (campaigns, count)
             else
-                return NotFounded
+                return NotFound
         }
         
         member this.GetCampaign advertiserId campaignId = async {
@@ -60,12 +60,12 @@ type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertise
                         let campaign = campaign.GetCampaign()
                         return Success campaign
                     else
-                        return NotFounded
+                        return NotFound
                 else
-                    return NotFounded
+                    return NotFound
             with
             | :? NullReferenceException ->
-                return NotFounded
+                return NotFound
         }
         
         member this.UpdateCampaign advertiserId campaignUpd = async {
@@ -87,12 +87,12 @@ type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertise
                         | None ->
                             return Conflict
                     else
-                        return NotFounded
+                        return NotFound
                 else
-                    return NotFounded
+                    return NotFound
             with
             | :? NullReferenceException ->
-                return NotFounded
+                return NotFound
         }
         
         member this.DeleteCampaign advertiserId campaignId = async {
@@ -105,10 +105,10 @@ type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertise
                         let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
                         return Success()
                     else
-                        return NotFounded
+                        return NotFound
                 else
-                    return NotFounded
+                    return NotFound
             with
             | :? NullReferenceException ->
-                return NotFounded
+                return NotFound
         }

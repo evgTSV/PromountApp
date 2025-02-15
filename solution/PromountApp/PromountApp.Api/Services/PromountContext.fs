@@ -21,6 +21,18 @@ type PromountContext(options: DbContextOptions<PromountContext>) =
     [<DefaultValue>]
     val mutable private campaigns: DbSet<CampaignDb>
     member this.Campaigns with get() = this.campaigns and set v = this.campaigns <- v
+    
+    [<DefaultValue>]
+    val mutable private impressionLogs: DbSet<ImpressionLog>
+    member this.ImpressionLogs with get() = this.impressionLogs and set v = this.impressionLogs <- v
+    
+    [<DefaultValue>]
+    val mutable private clickLogs: DbSet<ClickLog>
+    member this.ClickLogs with get() = this.clickLogs and set v = this.clickLogs <- v
+    
+    [<DefaultValue>]
+    val mutable private ads: DbSet<Ad>
+    member this.Ads with get() = this.ads and set v = this.ads <- v
         
     override this.OnModelCreating builder =
         builder

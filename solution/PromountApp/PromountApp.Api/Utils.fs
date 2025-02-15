@@ -19,8 +19,47 @@ type middleware = Func<HttpContext, Func<Task>, Task>
 
 type ServiceResponse<'a> =
     | Conflict
-    | NotFounded
+    | NotFound
     | Success of 'a
+    
+module ServiceAsyncResult =
+    let bind f xAsync =
+        async {
+            try
+                let! x = xAsync
+                match x with
+                | Success value -> return! f value
+                | NotFound -> return NotFound
+                | Conflict -> return Conflict
+            with
+            | :? NullReferenceException -> return NotFound
+        }
+
+    let map f xAsync =
+        async {
+            try
+                let! x = xAsync
+                match x with
+                | Success value -> return Success (f value)
+                | NotFound -> return NotFound
+                | Conflict -> return Conflict
+            with
+            | :? NullReferenceException -> return NotFound
+        }
+        
+    let wrapAsync f xAsync =
+        async {
+            try
+                let! x = xAsync
+                return Success (f x)
+            with
+            | :? NullReferenceException -> return NotFound
+        }
+
+    let return' x =
+        async {
+            return Success x
+        }
 
 let getEnv name =
     match Environment.GetEnvironmentVariable(name) with
@@ -57,3 +96,11 @@ let validateOptionV (validator: ValidatorFunc<'a>) (value: 'a Nullable) =
     if value.HasValue then
         validator(value.Value)
     else true
+    
+    
+let inline (|++|) (tuple1: ^T * ^U) (tuple2: ^T * ^U) : ^T * ^U
+    when ^T : (static member (+) : ^T * ^T -> ^T)
+    and  ^U : (static member (+) : ^U * ^U -> ^U) =
+    let a = fst tuple1 + fst tuple2
+    let b = snd tuple1 + snd tuple2
+    (a, b)
