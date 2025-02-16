@@ -15,21 +15,20 @@
       <Compile Include="TimeConfig.fs" />
       <Compile Include="Validation.fs" />
       <Compile Include="Models.fs" />
-      <Compile Include="AdMatchEngine.fs" />
       <Compile Include="Services\PromountContext.fs" />
       <Compile Include="Services\ClientsService.fs" />
       <Compile Include="Services\AdvertisersService.fs" />
       <Compile Include="Services\CampaignsService.fs" />
-      <Compile Include="Services\AdsService.fs" />
       <Compile Include="Services\StatisticsService.fs" />
+      <Compile Include="Services\AdMatchEngine.fs" />
+      <Compile Include="Services\AdsService.fs" />
       <Compile Include="Controllers\ClientsController.fs" />
       <Compile Include="Controllers\AdvertisersController.fs" />
       <Compile Include="Controllers\TimeController.fs" />
       <Compile Include="Controllers\MLScoresController.fs" />
       <Compile Include="Controllers\CampaignsController.fs" />
-      <Compile Include="Controllers\AdsController.fs" />
       <Compile Include="Controllers\StatisticsController.fs" />
-      <Compile Include="Migrations\AddAdsTable.fs" />
+      <Compile Include="Controllers\AdsController.fs" />
       <Compile Include="Migrations\AddClickLogsTable.fs" />
       <Compile Include="Migrations\AddImpressionLogsTable.fs" />
       <Compile Include="Migrations\AddCampaignTable.fs" />
@@ -43,6 +42,7 @@
       <PackageReference Include="EFCore.BulkExtensions" Version="9.0.0-rc.1" />
       <PackageReference Include="FluentMigrator" Version="6.2.0" />
       <PackageReference Include="FluentMigrator.Runner" Version="6.2.0" />
+      <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />
       <PackageReference Include="FSharp.Data.Validator" Version="9.0.2" />
       <PackageReference Include="Grafana.OpenTelemetry" Version="1.2.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />

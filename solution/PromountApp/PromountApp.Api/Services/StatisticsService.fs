@@ -12,6 +12,34 @@ type IStatisticsService =
     abstract member GetCampaignStatsDaily: Guid -> Async<ServiceResponse<DailyStats>>
     abstract member GetAdvertiserStats: Guid -> Async<ServiceResponse<Stats>>
     abstract member GetAdvertiserStatsDaily: Guid -> Async<ServiceResponse<DailyStats>>
+    
+type TotalCampaignStatisticsService(dbContext: PromountContext) =
+    let createStats (impressionLogs: ImpressionLog array) (clickLogs: ClickLog array) =
+        let impressionCount, impressionSpent =
+            impressionLogs |> Array.fold (fun acc l -> acc |++| (1, l.cost)) (0, 0)
+        let clickCount, clickSpent =
+            clickLogs |> Array.fold (fun acc l -> acc |++| (1, l.cost)) (0, 0)
+            
+        {
+            impressions_count = impressionCount
+            clicks_count = clickCount
+            conversion = if impressionCount = 0 then 0 else ((clickCount |> float) / (impressionCount |> float) * (100 |> float))
+            spent_impressions = impressionSpent
+            spent_clicks = clickSpent
+            spent_total = impressionSpent + clickSpent
+        }
+        
+    let getCampaignLogs (campaignId: Guid) = async {
+        let! campaign = dbContext.Campaigns.FindAsync(campaignId).AsTask() |> Async.AwaitTask
+        let campaignId = campaign.campaign_id
+        let impressionLogs = dbContext.ImpressionLogs.Where(fun l -> l.campaign_id = campaignId).ToArray()
+        let clickLogs = dbContext.ClickLogs.Where(fun l -> l.campaign_id = campaignId).ToArray()
+        
+        return Success (impressionLogs, clickLogs)
+    }
+    
+    member this.GetCampaignStats(campaignId) =
+        ServiceAsyncResult.bind (fun logs -> ServiceAsyncResult.return' (logs ||> createStats)) (getCampaignLogs campaignId)
 
 type StatisticsService(dbContext: PromountContext, timeService: TimeConfig) =
     

@@ -107,6 +107,7 @@ module Program =
             .AddScoped<IAdvertisersService, AdvertisersService>()
             .AddScoped<ICampaignsService, CampaignsService>()
             .AddScoped<IStatisticsService, StatisticsService>()
+            .AddScoped<IAdsService, AdsService>()
             .AddRouting()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen()

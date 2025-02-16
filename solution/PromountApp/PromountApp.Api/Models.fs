@@ -226,7 +226,6 @@ type CampaignUpdate = {
 
 [<CLIMutable>]
 type Ad = {
-    [<Key>]
     ad_id: Guid
     ad_title: string
     ad_text: string
