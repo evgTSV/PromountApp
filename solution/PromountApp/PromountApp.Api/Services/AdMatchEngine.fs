@@ -3,6 +3,7 @@
 open System
 open System.Collections.Generic
 open System.Linq
+open System.Threading
 open FSharp.Collections.ParallelSeq
 open FSharp.Data.Validator
 open Microsoft.FSharp.Collections
@@ -31,12 +32,16 @@ type ScoresCategories = {
     ml_score: int
     ad_cost: float
     ad_progress: float
+    out_of_limits_impression: bool
+    out_of_limits_click: bool
 } with
     static member Default= {
         campaign_id = Guid.Empty
         ml_score = 0
         ad_cost = 0
         ad_progress = 0
+        out_of_limits_impression = true
+        out_of_limits_click = true
     }
 
 let degreeOfParallel = Environment.ProcessorCount
@@ -90,18 +95,59 @@ let isBest (bestTarget: ScoresCategories) (adCampaign: ScoresCategories) =
     adCampaign.ad_cost >= bestTarget.ad_cost
     || adCampaign.ml_score >= bestTarget.ml_score
     
+let isOutOfImpressionLimit (stats: Stats) (adCampaign: CampaignDb) =
+    stats.impressions_count > adCampaign.impressions_limit
+    
+let isOutOfClickLimit (stats: Stats) (adCampaign: CampaignDb) =
+    stats.clicks_count > adCampaign.clicks_limit
+
+let private semaphore = new SemaphoreSlim(1, 1)   
+let getCampaignStatistics (dbContext: PromountContext, timeService: TimeConfig) (client: Client) (adCampaign: CampaignDb) = task {
+    do! semaphore.WaitAsync()
+    try
+        let staticsService = StatisticsService(dbContext, timeService) :> IStatisticsService
+        match! staticsService.GetCampaignStats(adCampaign.campaign_id) with
+        | Success stats ->
+            let! mlScore =
+                dbContext.MLScores
+                    .Where(fun ml -> ml.client_id = client.client_id && ml.advertiser_id = adCampaign.advertiser_id)
+                    .ToArrayAsync()
+            let mlScore = mlScore |> Array.tryHead |> Option.map _.score |> Option.defaultValue 0
+            let scores = {
+                campaign_id = adCampaign.campaign_id
+                ml_score = mlScore
+                ad_cost = costPerAd adCampaign
+                ad_progress = adProgress adCampaign stats
+                out_of_limits_impression = isOutOfImpressionLimit stats adCampaign
+                out_of_limits_click = isOutOfClickLimit stats adCampaign
+            }
+            return Some (adCampaign, scores)
+        | _ ->
+            return None
+    finally
+        semaphore.Release() |> ignore
+}
+    
 let getBestCampaignWithValidTarget (client: Client) (dbContext: PromountContext, timeService: TimeConfig)= task {
     try
-        let bestTarget =
+        let services = dbContext, timeService
+        let bestTargets =
               dbContext.Campaigns.AsParallel()
                   .WithExecutionMode(ParallelExecutionMode.ForceParallelism)
                   .WithDegreeOfParallelism(degreeOfParallel)
                   .Where(isActive (timeService.GetTotalDays()))
                   .Where(checkTargets client)
-                  .GroupBy(getTargetsScore client)
-                  .OrderByDescending(_.Key).First()
-                  .OrderByDescending(costPerAd).First()
-        return Some bestTarget
+                  
+        let bestTarget =
+            bestTargets
+            |> PSeq.choose ((getCampaignStatistics services client) >> _.Result)
+            |> PSeq.filter (snd >> _.out_of_limits_impression >> not)
+            |> PSeq.groupBy (fst >> getTargetsScore client)
+            |> PSeq.maxBy fst
+            |> snd
+            |> Seq.maxBy (fst >> costPerAd)
+                  
+        return Some (snd bestTarget)
     with
     | _ -> return None
 }
@@ -114,26 +160,7 @@ let getCommonCampaign (dbContext: PromountContext, timeService: TimeConfig) = ta
                 .Where(isCommon)
                 .ToArray()
 }
-
-let getCampaignStatistics (dbContext: PromountContext, timeService: TimeConfig) (client: Client) (adCampaign: CampaignDb) = task {
-    let staticsService = StatisticsService(dbContext, timeService) :> IStatisticsService
-    match! staticsService.GetCampaignStats(adCampaign.campaign_id) with
-    | Success stats ->
-        let! mlScore =
-            dbContext.MLScores
-                .Where(fun ml -> ml.client_id = client.client_id && ml.advertiser_id = adCampaign.advertiser_id)
-                .ToArrayAsync()
-        let mlScore = mlScore |> Array.tryHead |> Option.map _.score |> Option.defaultValue 0
-        let scores = {
-            campaign_id = adCampaign.campaign_id
-            ml_score = mlScore
-            ad_cost = costPerAd adCampaign
-            ad_progress = adProgress adCampaign stats
-        }
-        return Some (adCampaign.campaign_id, scores)
-    | _ -> return None
-}
-    
+ 
 let getBestCampaignByScores (bestTarget: ScoresCategories option) (scores: Dictionary<Guid, ScoresCategories>)=
     let bestTargetScores =
         bestTarget
@@ -147,13 +174,14 @@ let getBestCampaignByScores (bestTarget: ScoresCategories option) (scores: Dicti
         |> PSeq.withDegreeOfParallelism degreeOfParallel
         |> PSeq.filter (fun s ->
              s.Value |> isBest bestTargetScores)
+        |> PSeq.filter (fun g -> g.Key <> Guid.Empty)
         |> PSeq.groupBy _.Value.ad_progress
         |> PSeq.sortBy fst
         |> PSeq.toArray
-        |> Array.tryLast
+        |> Array.tryHead
         
-    bestCommonAdCampaigns |> Option.map (fun ads ->
-        if ads |> (snd >> Seq.isEmpty >> not) then
+    bestCommonAdCampaigns |> Option.bind (fun ads ->
+        if ads |> (snd >> Seq.isEmpty  >> not) then
             let random = ads |> (snd >> Seq.randomChoice)
             Some random.Key
         else
@@ -165,14 +193,12 @@ let getBestCampaign (client: Client) (dbContext: PromountContext, timeService: T
     let commonCampaignsTask = getCommonCampaign services
     
     let! bestTargetStats = bestTargetTask
-    let bestTargetStats =
-        bestTargetStats
-        |> Option.bind (fun bt -> getCampaignStatistics services client bt |> _.Result)
-        |> Option.map snd
     let! commonCampaigns = commonCampaignsTask
     let commonCampaigns =
         commonCampaigns
-        |> Seq.choose (fun bt -> getCampaignStatistics services client bt |> _.Result)
+        |> PSeq.choose (fun bt -> getCampaignStatistics services client bt |> _.Result)
+        |> PSeq.filter (snd >> _.out_of_limits_impression >> not)
+        |> PSeq.map (fun (c, s) -> (c.campaign_id, s))
         |> PSeq.fold (fun (acc: Dictionary<_,_>) (key, value) ->
             acc[key] <- value
             acc

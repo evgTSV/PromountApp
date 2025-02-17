@@ -17,8 +17,14 @@ type AdsService(dbContext: PromountContext, timeService: TimeConfig) =
         let currDay = timeService.GetTotalDays()
         let! ad = dbContext.Campaigns.FindAsync(adId).AsTask() |> Async.AwaitTask
         let! client = dbContext.Clients.FindAsync(clientId).AsTask() |> Async.AwaitTask
+        let! stats = getCampaignStatistics (dbContext, timeService) client ad |> Async.AwaitTask
+        let isInLimits =
+            stats
+            |> Option.map snd
+            |> Option.map (_.out_of_limits_click >> not)
+            |> Option.defaultValue false
         
-        if currDay >= ad.start_date && currDay <= ad.end_date then     
+        if currDay >= ad.start_date && currDay <= ad.end_date && isInLimits then     
             let log = {
                 id = Guid.NewGuid()
                 client_id = client.client_id
