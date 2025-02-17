@@ -78,3 +78,14 @@ type CampaignsController(campaignsService: ICampaignsService) =
         | _ ->
             return failwith "Internal Error"
     }
+    
+    [<HttpGet("{advertiserId:Guid}/campaigns/{campaignId:Guid}/gen-text")>]
+    member this.GenTextForCampaign(advertiserId: Guid, campaignId: Guid) = task {
+        match! campaignsService.GenTextForCampaign advertiserId campaignId with
+        | Success text ->
+            return OkObjectResult({| ad_text = text |}) :> IActionResult
+        | NotFound ->
+            return NotFoundResult() :> IActionResult
+        | _ ->
+            return failwith "Internal Error"
+    }

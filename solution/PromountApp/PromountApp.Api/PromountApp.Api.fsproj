@@ -15,7 +15,8 @@
       <Compile Include="TimeConfig.fs" />
       <Compile Include="Validation.fs" />
       <Compile Include="Models.fs" />
-      <Compile Include="Services\PromountContext.fs" />
+      <Compile Include="PromountContext.fs" />
+      <Compile Include="ML.fs" />
       <Compile Include="Services\ClientsService.fs" />
       <Compile Include="Services\AdvertisersService.fs" />
       <Compile Include="Services\CampaignsService.fs" />

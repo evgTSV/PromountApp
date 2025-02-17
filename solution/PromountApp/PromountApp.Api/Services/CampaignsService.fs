@@ -3,6 +3,7 @@
 open System
 open System.Linq
 open Microsoft.EntityFrameworkCore
+open PromountApp.Api
 open PromountApp.Api.Models
 open PromountApp.Api.Utils
 
@@ -12,6 +13,7 @@ type ICampaignsService =
     abstract member GetCampaign: Guid -> Guid -> Async<ServiceResponse<Campaign>>
     abstract member UpdateCampaign: Guid -> CampaignUpdate -> Async<ServiceResponse<Campaign>>
     abstract member DeleteCampaign: Guid -> Guid -> Async<ServiceResponse<unit>>
+    abstract member GenTextForCampaign: Guid -> Guid -> Async<ServiceResponse<string>>
     
 type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertisersService) =
     let isAdvertiserExists advertiserId = async {
@@ -112,3 +114,6 @@ type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertise
             | :? NullReferenceException ->
                 return NotFound
         }
+        
+        member this.GenTextForCampaign advertiserId campaignId =
+            ServiceAsyncResult.bind ServiceAsyncResult.return' (ML.genTextFromML dbContext advertiserId campaignId)

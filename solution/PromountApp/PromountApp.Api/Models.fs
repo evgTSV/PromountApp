@@ -43,6 +43,9 @@ type Advertiser = {
     [<Required>]
     name: string
 } with
+    override this.ToString() =
+        $"Рекламодатель - {this.name}"
+        
     interface IValidatable with
         member this.Validate() =
             this.name |> requiresTextLength (1, 200)
@@ -64,6 +67,12 @@ type Targeting = {
     age_to: int Nullable
     location: string | null
 } with
+    override this.ToString() =
+        $"Целевая аудитория:
+            Пол - {this.gender |> defaultIfNull (Enum.GetName(Gender.ALL))};
+            Возраст от {this.age_from |> defaultIfNullV 0} до {this.age_to |> defaultIfNullV 100}
+            Местоположение - {this.location |> defaultIfNull null}"
+    
     interface IValidatable with
         member this.Validate() =
             this.gender |> validateOption' (isEnumCase typeof<Gender>)
@@ -98,6 +107,11 @@ type Campaign = {
     [<Required>]
     targeting: Targeting
 } with
+    override this.ToString() =
+        $"Рекламная кампания {this.ad_title}:
+            Продолжительность - с {this.start_date} по {this.end_date};
+            {this.targeting}"
+            
     interface IValidatable with
         member this.Validate() =
             let timeService = ServiceLocator.GetService<TimeConfig>()
