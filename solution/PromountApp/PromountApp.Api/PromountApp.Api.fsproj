@@ -17,6 +17,7 @@
       <Compile Include="Models.fs" />
       <Compile Include="PromountContext.fs" />
       <Compile Include="ML.fs" />
+      <Compile Include="Services\ObjectStorage.fs" />
       <Compile Include="Services\ClientsService.fs" />
       <Compile Include="Services\AdvertisersService.fs" />
       <Compile Include="Services\CampaignsService.fs" />
@@ -30,6 +31,7 @@
       <Compile Include="Controllers\CampaignsController.fs" />
       <Compile Include="Controllers\StatisticsController.fs" />
       <Compile Include="Controllers\AdsController.fs" />
+      <Compile Include="Controllers\AdImageController.fs" />
       <Compile Include="Migrations\AddClickLogsTable.fs" />
       <Compile Include="Migrations\AddImpressionLogsTable.fs" />
       <Compile Include="Migrations\AddCampaignTable.fs" />
@@ -40,6 +42,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AspNetCore.Yandex.ObjectStorage" Version="0.2.2" />
       <PackageReference Include="EFCore.BulkExtensions" Version="9.0.0-rc.1" />
       <PackageReference Include="FluentMigrator" Version="6.2.0" />
       <PackageReference Include="FluentMigrator.Runner" Version="6.2.0" />

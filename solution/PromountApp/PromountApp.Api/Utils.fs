@@ -1,6 +1,7 @@
 ﻿module PromountApp.Api.Utils
 
 open System
+open System.IO
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
 open FSharp.Data.Validator
@@ -20,6 +21,7 @@ type middleware = Func<HttpContext, Func<Task>, Task>
 type ServiceResponse<'a> =
     | Conflict
     | NotFound
+    | InvalidFormat of string
     | Success of 'a
     
 module ServiceAsyncResult =

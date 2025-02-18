@@ -3,6 +3,8 @@ namespace PromountApp.Api
 open System
 open System.Text.Json
 open System.Text.Json.Serialization
+open AspNetCore.Yandex.ObjectStorage
+open AspNetCore.Yandex.ObjectStorage.Extensions
 open FluentMigrator.Runner
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
@@ -89,6 +91,14 @@ module Program =
         opts.WriteIndented <- true
         opts.NumberHandling <- JsonNumberHandling.AllowNamedFloatingPointLiterals)
 
+    let configureS3ObjectStorage (services: IServiceCollection) =
+        services.AddYandexObjectStorage(fun options ->
+            options.BucketName <- getEnv "S3_BUCKET_NAME"
+            options.Location <- getEnvOr "S3_LOCATION" "ru-central1-a"
+            options.AccessKey <- getEnv "S3_ACCESS_KEY"
+            options.SecretKey <- getEnv "S3_SECRET_KEY")
+        services.AddSingleton<IYandexStorageService, YandexStorageService>()
+    
     let configureServiceLocator (services: IServiceCollection) =
         ServiceLocator.SetProvider(
             services
@@ -101,6 +111,7 @@ module Program =
         configureRedis services
         configureOTel services
         configureLogger services
+        configureS3ObjectStorage services
         services
             .AddSingleton<TimeConfig>()
             .AddScoped<IClientsService, ClientsService>()
@@ -108,6 +119,7 @@ module Program =
             .AddScoped<ICampaignsService, CampaignsService>()
             .AddScoped<IStatisticsService, StatisticsService>()
             .AddScoped<IAdsService, AdsService>()
+            .AddScoped<IImageStorage, AdImageStorage>()
             .AddRouting()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen()
