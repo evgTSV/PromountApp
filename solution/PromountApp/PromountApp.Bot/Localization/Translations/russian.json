@@ -1,0 +1,11 @@
+﻿{
+  "FlagEmoji": "\uD83C\uDDF7\uD83C\uDDFA",
+  "LangName": "Русский",
+  "SelectLanguageText": "Вот языки которые я поддерживаю:",
+  "ChangedLanguageText": "Язык установлен на %s",
+  "WelcomeText": "%s, вас приветствует бот системы продвижения рекламы!\n\n<b>Войдите</b> или <b>Зарегистрируйтесь</b>",
+  "LoginButtonText": "Вход",
+  "RegisterButtonText": "Регистрация",
+  "ConsoleHomeText": "Добро пожаловать <b>%s</b> в меню управления!\nСоздавайте, редактируйте, отслеживайте свои рекламные кампании",
+  "CreateCampaignButtonText": "Создать кампанию"
+}

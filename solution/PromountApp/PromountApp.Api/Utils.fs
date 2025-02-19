@@ -33,6 +33,7 @@ module ServiceAsyncResult =
                 | Success value -> return! f value
                 | NotFound -> return NotFound
                 | Conflict -> return Conflict
+                | InvalidFormat s -> return InvalidFormat s
             with
             | :? NullReferenceException -> return NotFound
         }
@@ -45,6 +46,7 @@ module ServiceAsyncResult =
                 | Success value -> return Success (f value)
                 | NotFound -> return NotFound
                 | Conflict -> return Conflict
+                | InvalidFormat s -> return InvalidFormat s
             with
             | :? NullReferenceException -> return NotFound
         }
@@ -98,8 +100,7 @@ let validateOptionV (validator: ValidatorFunc<'a>) (value: 'a Nullable) =
     if value.HasValue then
         validator(value.Value)
     else true
-    
-    
+     
 let inline (|++|) (tuple1: ^T * ^U) (tuple2: ^T * ^U) : ^T * ^U
     when ^T : (static member (+) : ^T * ^T -> ^T)
     and  ^U : (static member (+) : ^U * ^U -> ^U) =

@@ -1,0 +1,11 @@
+﻿{
+  "FlagEmoji": "\uD83C\uDDF0\uD83C\uDDF5",
+  "LangName": "조선글",
+  "SelectLanguageText": "내가 지원하는 언어는 다음과 같습니다",
+  "ChangedLanguageText": "언어가 %s 로 설정되었습니다",
+  "WelcomeText": "%s, 광고 홍보 시스템의 봇이 당신을 환영합니다!\n\n<b>로그인</b> 또는 <b>등록</b>\n\n <b>경애하는 최고령도자 김정은동지 만세!</b> ",
+  "LoginButtonText": "로그인",
+  "RegisterButtonText": "등록",
+  "ConsoleHomeText": "<b>%s</b> 를 제어 메뉴에 오신 것을 환영합니다!\n광고 캠페인을 만들고, 편집하고, 추적하세요",
+  "CreateCampaignButtonText": "캠페인 만들기"
+}

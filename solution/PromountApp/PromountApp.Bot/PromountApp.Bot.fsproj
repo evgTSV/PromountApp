@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+      <Content Include="Dockerfile" />
+      <Compile Include="Utils.fs" />
+      <Compile Include="Localization\Translator.fs" />
+      <Content Include="Localization\Translations\*.json" CopyToOutputDirectory="Always" />
+      <Compile Include="Controls.fs" />
+      <Compile Include="Keyboards.fs" />
+      <Compile Include="Pages\IPage.fs" />
+      <Compile Include="Pages\AuthPage.fs" />
+      <Compile Include="Pages\SelectLangPage.fs" />
+      <Compile Include="Pages\StartPage.fs" />
+      <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FSharp.Data" Version="6.4.1" />
+      <PackageReference Include="Funogram" Version="3.0.2" />
+      <PackageReference Include="Funogram.Telegram" Version="8.3.0" />
+    </ItemGroup>
+
+</Project>

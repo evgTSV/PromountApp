@@ -15,6 +15,21 @@
       - .env
     networks:
       - mynetwork
+  
+  bot:
+    image: promountbot
+    build:
+      context: PromountApp/PromountApp.Bot
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - web
+    ports:
+      - "8081:8080"
+    env_file:
+      - .env
+    networks:
+      - mynetwork
       
   db:
     image: postgres:latest

@@ -4,6 +4,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PromountApp.Api", "Promount
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PromountApp.Api.Tests", "PromountApp.Api.Tests\PromountApp.Api.Tests.fsproj", "{C6EFB6E7-D8C7-4789-AD22-FE7E37AE42C3}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PromountApp.Bot", "PromountApp.Bot\PromountApp.Bot.fsproj", "{A2F7E350-1009-4CEC-BC0A-EC2A44A27271}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{C6EFB6E7-D8C7-4789-AD22-FE7E37AE42C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6EFB6E7-D8C7-4789-AD22-FE7E37AE42C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6EFB6E7-D8C7-4789-AD22-FE7E37AE42C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2F7E350-1009-4CEC-BC0A-EC2A44A27271}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2F7E350-1009-4CEC-BC0A-EC2A44A27271}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2F7E350-1009-4CEC-BC0A-EC2A44A27271}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2F7E350-1009-4CEC-BC0A-EC2A44A27271}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
