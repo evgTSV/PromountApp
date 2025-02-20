@@ -25,6 +25,7 @@
 
     <ItemGroup>
       <PackageReference Include="FSharp.Data" Version="6.4.1" />
+      <PackageReference Include="FSharp.Quotations.Evaluator" Version="2.1.0" />
       <PackageReference Include="Funogram" Version="3.0.2" />
       <PackageReference Include="Funogram.Telegram" Version="8.3.0" />
     </ItemGroup>

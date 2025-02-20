@@ -6,6 +6,7 @@ open Microsoft.EntityFrameworkCore
 open PromountApp.Api
 open PromountApp.Api.Models
 open PromountApp.Api.ModerationAPI
+open PromountApp.Api.ModerationModels
 open PromountApp.Api.Utils
 
 type ICampaignsService =
@@ -17,7 +18,7 @@ type ICampaignsService =
     abstract member GenTextForCampaign: Guid -> Guid -> Async<ServiceResponse<string>>
     abstract member ModerateCampaign: Guid -> Guid -> Async<ServiceResponse<AnalyzeResponse>>
     
-type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertisersService) =
+type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertisersService, banListService: IBanListService) =
     let isAdvertiserExists advertiserId = async {
         match! advertisersService.GetAdvertiser(advertiserId) with
         | Success _ -> return true
@@ -132,7 +133,11 @@ type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertise
                 let! ml_score = ML.moderateTextFromML dbContext advertiserId campaignId
                 match ml_score with
                 | Success ml_score ->
-                    return Success { r with ml_prediction_score = Nullable(ml_score |> float) }
+                    let result = { r with ml_prediction_score = Nullable(ml_score |> float) }
+                    if result.IsProbablyIncorrect() then
+                        let! _ = banListService.Ban advertiserId campaignId result
+                        ()
+                    return Success result
                 | _ ->
                     return Success r
             })

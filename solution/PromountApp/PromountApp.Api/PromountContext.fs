@@ -2,6 +2,10 @@
 
 open Microsoft.EntityFrameworkCore
 open PromountApp.Api.Models
+open Newtonsoft.Json
+open Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure
+open Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal
+open PromountApp.Api.ModerationModels
 
 type PromountContext(options: DbContextOptions<PromountContext>) =
     inherit DbContext(options)
@@ -29,15 +33,26 @@ type PromountContext(options: DbContextOptions<PromountContext>) =
     [<DefaultValue>]
     val mutable private clickLogs: DbSet<ClickLog>
     member this.ClickLogs with get() = this.clickLogs and set v = this.clickLogs <- v
+    
+    [<DefaultValue>]
+    val mutable private banLogs: DbSet<BanLog>
+    member this.BanLogs with get() = this.banLogs and set v = this.banLogs <- v
         
     override this.OnModelCreating builder =
         builder
             .Entity<MLScore>()
             .HasKey("client_id", "advertiser_id") |> ignore
+        builder
+            .Entity<BanLog>()
+            .Property(_.probability)
+            .HasConversion(
+                JsonConvert.SerializeObject,
+                JsonConvert.DeserializeObject<AnalyzeResponse>) |> ignore
         base.OnModelCreating(builder)
         
     override this.OnConfiguring(options: DbContextOptionsBuilder) : unit =
         options.UseNpgsql(fun builder ->
-            builder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+            builder
+                .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
             |> ignore)
         |> ignore

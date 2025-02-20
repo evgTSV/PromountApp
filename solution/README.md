@@ -130,6 +130,30 @@ _**Шаги алгоритма:**_
 
 - Если лимит одной из них вышел, то идёт переключение на более упрощённую.
 
+#### Модерация рекламной кампании
+Для модерации используются результаты анализа от `GLM-4` и от специального API модерации `Perspective API`
+
+Кампания не проходит модерацию, если одно из показателей превышает определённый порог
+
+**Показатели (числа от 0 до 1):**
+- TOXICITY: Токсичность
+- SEVERE_TOXICITY: Серьезная токсичность
+- IDENTITY_ATTACK: Атака на личность
+- INSULT: Оскорбление
+- PROFANITY: Сквернословие
+- THREAT: Угроза
+- ML_PREDICTION: оценка от `GLM-4`
+
+Чтобы модерировать текст, нужно отправить GET запрос на `/advertisers/{advertisersId}/campaigns/{campaignsId}/moderate`
+
+В результате вернутся показатели, а если они были превышены, то кампания отправится в бан лист и не будет отображаться у пользователей
+
+Также имеются точки для взаимодействия с бан листом
+- `GET /ads/ban-list` - получение списка забаненых кампаний
+- `DELETE /ads/{campaignId}/ban` - разбан кампании
+
+_Банить может только алгоритм модерации_
+
 ### Хранение изображений рекламных кампаний
 Управление изображением производится через `/advertisers/{advertisersId}/campaigns/{campaignsId}/img`
 
@@ -145,7 +169,7 @@ _**Шаги алгоритма:**_
 ### Схема отношений моделей СУБД
 
 ---
-(для отображения необходима поддержка Mermaid)
+_(для отображения необходима поддержка Mermaid)_
 ```mermaid
 erDiagram
     CLIENT {
@@ -187,7 +211,7 @@ erDiagram
         string location
     }
     IMPRESSION_LOG {
-        Guid id 
+        Guid id
         Guid client_id
         Guid campaign_id
         int timestamp
@@ -198,23 +222,37 @@ erDiagram
         Guid campaign_id
         int timestamp
     }
+    BAN_LOG {
+        Guid id
+        Guid campaign_id
+        Guid advertiser_id
+        AnalyzeResponse probability
+    }
     AD {
         Guid ad_id
         string ad_title
         string ad_text
         Guid advertiser_id
     }
+    ANALYZE_REQUEST {
+        Guid id
+        string text
+        string languages
+        string requestedAttributes
+    }
 
     CLIENT ||--o{ MLSCORE : has
     ADVERTISER ||--o{ MLSCORE : has
     ADVERTISER ||--o{ CAMPAIGN : runs
     CAMPAIGN ||--|{ TARGETING : includes
-    CLIENT ||--o{ IMPRESSION_LOG : interacts_with
-    CLIENT ||--o{ CLICK_LOG : interacts_with
-    CAMPAIGN ||--o{ IMPRESSION_LOG : generates
-    CAMPAIGN ||--o{ CLICK_LOG : generates
-    ADVERTISER ||--o{ AD : creates
-    CAMPAIGN ||--o{ AD : uses
+    CLIENT ||--o{ IMPRESSION_LOG : generates
+    CLIENT ||--o{ CLICK_LOG : generates
+    CAMPAIGN ||--o{ IMPRESSION_LOG : interacts_with
+    CAMPAIGN ||--o{ CLICK_LOG : interacts_with
+    ADVERTISER ||--o{ AD : uses
+    CAMPAIGN ||--o{ AD : creates
+    CAMPAIGN ||--o{ BAN_LOG : flagged_by
+    BAN_LOG ||--o{ ANALYZE_REQUEST : based_on
 ```
 
 [egorBo]: https://github.com/EgorBo

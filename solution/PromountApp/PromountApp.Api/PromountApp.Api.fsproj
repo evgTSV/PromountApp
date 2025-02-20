@@ -21,6 +21,7 @@
       <Compile Include="Services\ObjectStorage.fs" />
       <Compile Include="Services\ClientsService.fs" />
       <Compile Include="Services\AdvertisersService.fs" />
+      <Compile Include="Services\BanListService.fs" />
       <Compile Include="Services\CampaignsService.fs" />
       <Compile Include="Services\StatisticsService.fs" />
       <Compile Include="Services\AdMatchEngine.fs" />
@@ -33,6 +34,8 @@
       <Compile Include="Controllers\StatisticsController.fs" />
       <Compile Include="Controllers\AdsController.fs" />
       <Compile Include="Controllers\AdImageController.fs" />
+      <Compile Include="Controllers\BanListController.fs" />
+      <Compile Include="Migrations\AddBanLogsTable.fs" />
       <Compile Include="Migrations\AddClickLogsTable.fs" />
       <Compile Include="Migrations\AddImpressionLogsTable.fs" />
       <Compile Include="Migrations\AddCampaignTable.fs" />
@@ -48,7 +51,9 @@
       <PackageReference Include="FluentMigrator" Version="6.2.0" />
       <PackageReference Include="FluentMigrator.Runner" Version="6.2.0" />
       <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />
+      <PackageReference Include="FSharp.Data.Html.Core" Version="6.4.1" />
       <PackageReference Include="FSharp.Data.Validator" Version="9.0.2" />
+      <PackageReference Include="FSharp.Quotations.Evaluator" Version="2.1.0" />
       <PackageReference Include="Grafana.OpenTelemetry" Version="1.2.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
@@ -58,7 +63,10 @@
       <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.2" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
+      <PackageReference Include="Npgsql" Version="9.0.2" />
+      <PackageReference Include="Npgsql.DependencyInjection" Version="9.0.2" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
+      <PackageReference Include="Npgsql.Json.NET" Version="9.0.2" />
       <PackageReference Include="Npgsql.OpenTelemetry" Version="9.0.2" />
       <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.11.0-beta.1" />
       <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.1" />

@@ -5,82 +5,10 @@ open System.Net.Http
 open System.Text
 open Newtonsoft.Json
 open PromountApp.Api.Models
+open PromountApp.Api.ModerationModels
 open PromountApp.Api.Utils
 
 let key = getEnv "GC_PERSPECTIVE_TOKEN"
-
-[<CLIMutable>]
-type Comment = {
-    text: string
-}
-
-[<CLIMutable>]
-type RequestedAttributes = {
-    TOXICITY: obj
-    SEVERE_TOXICITY: obj
-    IDENTITY_ATTACK: obj
-    INSULT: obj
-    PROFANITY: obj
-    THREAT: obj
-}
-
-[<CLIMutable>]
-type AnalyzeRequest = {
-    comment: Comment
-    languages: string list
-    requestedAttributes: RequestedAttributes
-} with
-    static member CreateRequest(text: string) = {
-        comment = {
-            text = text
-        }
-        languages = ["ru"; "en"]
-        requestedAttributes = {
-            TOXICITY = Object
-            SEVERE_TOXICITY = Object
-            IDENTITY_ATTACK = Object
-            INSULT = Object
-            PROFANITY = Object
-            THREAT = Object
-        }
-    }
-
-[<CLIMutable>]
-type SummaryScore = {
-    value: float
-    ``type``: string
-}
-
-[<CLIMutable>]
-type AttributeScore = {
-    summaryScore: SummaryScore
-}
-
-[<CLIMutable>]
-type AttributeScores = {
-    TOXICITY: AttributeScore
-    SEVERE_TOXICITY: AttributeScore
-    IDENTITY_ATTACK: AttributeScore
-    INSULT: AttributeScore
-    PROFANITY: AttributeScore
-    THREAT: AttributeScore
-}
-
-[<CLIMutable>]
-type AnalyzeResponse = {
-    attributeScores: AttributeScores
-    languages: string list
-    detectedLanguages: string list
-    ml_prediction_score: float Nullable
-} with
-    member this.IsProbablyIncorrect() =
-        (this.ml_prediction_score |> validateOptionV ((>=) 0.65)
-        && this.attributeScores.TOXICITY.summaryScore.value <= 0.50
-        && this.attributeScores.SEVERE_TOXICITY.summaryScore.value <= 0.50
-        && this.attributeScores.IDENTITY_ATTACK.summaryScore.value <= 0.50
-        && this.attributeScores.INSULT.summaryScore.value <= 0.50
-        && this.attributeScores.PROFANITY.summaryScore.value <= 0.50
-        && this.attributeScores.THREAT.summaryScore.value <= 0.50) |> not
 
 let analyzeCampaign (advertiser: Advertiser) (campaign: Campaign) = async {
     let text = $"Рекламодатель {advertiser.name}; {campaign}"

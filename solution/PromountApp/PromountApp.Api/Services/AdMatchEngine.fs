@@ -34,6 +34,7 @@ type ScoresCategories = {
     ad_progress: float
     out_of_limits_impression: bool
     out_of_limits_click: bool
+    in_ban_list: bool
 } with
     static member Default= {
         campaign_id = Guid.Empty
@@ -42,6 +43,7 @@ type ScoresCategories = {
         ad_progress = 0
         out_of_limits_impression = true
         out_of_limits_click = true
+        in_ban_list = false
     }
 
 let degreeOfParallel = Environment.ProcessorCount
@@ -100,6 +102,11 @@ let isOutOfImpressionLimit (stats: Stats) (adCampaign: CampaignDb) =
     
 let isOutOfClickLimit (stats: Stats) (adCampaign: CampaignDb) =
     stats.clicks_count > adCampaign.clicks_limit
+    
+let inBanList (adId: Guid) (dbContext: PromountContext)= async {
+    let! result = dbContext.BanLogs.Where(fun l -> l.campaign_id = adId).CountAsync() |> Async.AwaitTask 
+    return result > 0
+}
 
 let private semaphore = new SemaphoreSlim(1, 1)   
 let getCampaignStatistics (dbContext: PromountContext, timeService: TimeConfig) (client: Client) (adCampaign: CampaignDb) = task {
@@ -113,6 +120,7 @@ let getCampaignStatistics (dbContext: PromountContext, timeService: TimeConfig) 
                     .Where(fun ml -> ml.client_id = client.client_id && ml.advertiser_id = adCampaign.advertiser_id)
                     .ToArrayAsync()
             let mlScore = mlScore |> Array.tryHead |> Option.map _.score |> Option.defaultValue 0
+            let! inBan = inBanList adCampaign.campaign_id dbContext
             let scores = {
                 campaign_id = adCampaign.campaign_id
                 ml_score = mlScore
@@ -120,6 +128,7 @@ let getCampaignStatistics (dbContext: PromountContext, timeService: TimeConfig) 
                 ad_progress = adProgress adCampaign stats
                 out_of_limits_impression = isOutOfImpressionLimit stats adCampaign
                 out_of_limits_click = isOutOfClickLimit stats adCampaign
+                in_ban_list = inBan
             }
             return Some (adCampaign, scores)
         | _ ->
@@ -142,6 +151,7 @@ let getBestCampaignWithValidTarget (client: Client) (dbContext: PromountContext,
             bestTargets
             |> PSeq.choose ((getCampaignStatistics services client) >> _.Result)
             |> PSeq.filter (snd >> _.out_of_limits_impression >> not)
+            |> PSeq.filter (snd >> _.in_ban_list >> not)
             |> PSeq.groupBy (fst >> getTargetsScore client)
             |> PSeq.maxBy fst
             |> snd
@@ -198,6 +208,7 @@ let getBestCampaign (client: Client) (dbContext: PromountContext, timeService: T
         commonCampaigns
         |> PSeq.choose (fun bt -> getCampaignStatistics services client bt |> _.Result)
         |> PSeq.filter (snd >> _.out_of_limits_impression >> not)
+        |> PSeq.filter (snd >> _.in_ban_list >> not)
         |> PSeq.map (fun (c, s) -> (c.campaign_id, s))
         |> PSeq.fold (fun (acc: Dictionary<_,_>) (key, value) ->
             acc[key] <- value

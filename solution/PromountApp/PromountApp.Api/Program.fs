@@ -120,6 +120,7 @@ module Program =
             .AddScoped<IStatisticsService, StatisticsService>()
             .AddScoped<IAdsService, AdsService>()
             .AddScoped<IImageStorage, AdImageStorage>()
+            .AddScoped<IBanListService, BanListService>()
             .AddRouting()
             .AddEndpointsApiExplorer()
             .AddSwaggerGen()

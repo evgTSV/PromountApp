@@ -1,6 +1,7 @@
 ﻿namespace PromountApp.Api.Services
 
 open System
+open System.Linq
 open PromountApp.Api
 open PromountApp.Api.AdMatchEngine
 open PromountApp.Api.Models
@@ -12,6 +13,10 @@ type IAdsService =
     abstract member ClickOnAd: Guid -> Guid -> Async<ServiceResponse<unit>>
     
 type AdsService(dbContext: PromountContext, timeService: TimeConfig) =
+    let notInBanList (adId: Guid) = async {
+        let! result = dbContext.BanLogs.Where(fun l -> l.campaign_id = adId).CountAsync() |> Async.AwaitTask 
+        return result = 0
+    }
     
     let clickOnAd (adId: Guid) (clientId: Guid) = async {
         let currDay = timeService.GetTotalDays()
@@ -23,8 +28,9 @@ type AdsService(dbContext: PromountContext, timeService: TimeConfig) =
             |> Option.map snd
             |> Option.map (_.out_of_limits_click >> not)
             |> Option.defaultValue false
+        let! notInBan = notInBanList adId
         
-        if currDay >= ad.start_date && currDay <= ad.end_date && isInLimits then     
+        if currDay >= ad.start_date && currDay <= ad.end_date && isInLimits && notInBan then     
             let log = {
                 id = Guid.NewGuid()
                 client_id = client.client_id
