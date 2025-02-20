@@ -89,3 +89,14 @@ type CampaignsController(campaignsService: ICampaignsService) =
         | _ ->
             return failwith "Internal Error"
     }
+    
+    [<HttpGet("{advertiserId:Guid}/campaigns/{campaignId:Guid}/moderate")>]
+    member this.ModerateCampaign(advertiserId: Guid, campaignId: Guid) = task {
+        match! campaignsService.ModerateCampaign advertiserId campaignId with
+        | Success analyzeResult ->
+            return OkObjectResult(analyzeResult) :> IActionResult
+        | NotFound ->
+            return NotFoundResult() :> IActionResult
+        | _ ->
+            return failwith "Internal Error"
+    }

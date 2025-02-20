@@ -5,6 +5,7 @@ open System.Linq
 open Microsoft.EntityFrameworkCore
 open PromountApp.Api
 open PromountApp.Api.Models
+open PromountApp.Api.ModerationAPI
 open PromountApp.Api.Utils
 
 type ICampaignsService =
@@ -14,6 +15,7 @@ type ICampaignsService =
     abstract member UpdateCampaign: Guid -> CampaignUpdate -> Async<ServiceResponse<Campaign>>
     abstract member DeleteCampaign: Guid -> Guid -> Async<ServiceResponse<unit>>
     abstract member GenTextForCampaign: Guid -> Guid -> Async<ServiceResponse<string>>
+    abstract member ModerateCampaign: Guid -> Guid -> Async<ServiceResponse<AnalyzeResponse>>
     
 type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertisersService) =
     let isAdvertiserExists advertiserId = async {
@@ -117,3 +119,20 @@ type CampaignsService(dbContext: PromountContext, advertisersService: IAdvertise
         
         member this.GenTextForCampaign advertiserId campaignId =
             ServiceAsyncResult.bind ServiceAsyncResult.return' (ML.genTextFromML dbContext advertiserId campaignId)
+
+        member this.ModerateCampaign advertiserId campaignId =
+            advertisersService.GetAdvertiser(advertiserId)
+            |> ServiceAsyncResult.bind (fun a -> async {
+                let! campaign = (this :> ICampaignsService).GetCampaign advertiserId campaignId
+                match campaign with
+                | Success campaign -> return Success(a, campaign)
+                | _ -> return NotFound})
+            |> ServiceAsyncResult.bind (fun ac -> ac ||> analyzeCampaign)
+            |> ServiceAsyncResult.bind (fun r -> async {               
+                let! ml_score = ML.moderateTextFromML dbContext advertiserId campaignId
+                match ml_score with
+                | Success ml_score ->
+                    return Success { r with ml_prediction_score = Nullable(ml_score |> float) }
+                | _ ->
+                    return Success r
+            })

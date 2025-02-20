@@ -5,6 +5,7 @@ open System.IO
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Http
 open FSharp.Data.Validator
+open Newtonsoft.Json.Linq
 type ServiceLocator() =
     static let mutable serviceProvider: IServiceProvider option = None
 

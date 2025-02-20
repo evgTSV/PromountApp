@@ -55,18 +55,9 @@ let parseContent (json: string) =
     let jObject = JObject.Parse(json)
     let content = jObject.SelectToken("choices[0].message.content").ToString()
     content
-
-let genTextFromML (dbContext: PromountContext) (advertiserId: Guid) (campaignId: Guid) = async {
-        let! advertiser = dbContext.Advertisers.FindAsync(advertiserId).AsTask() |> Async.AwaitTask
-        let! campaign = dbContext.Campaigns.FindAsync(campaignId).AsTask() |> Async.AwaitTask
-        let campaign = campaign.GetCampaign()
-        
+    
+let requestToModel input = async {        
         let key = getEnv "ZHIPU_KEY"
-        let input =
-            $"-Context: Создай текст для рекламной кампании {advertiser};
-            Информация: {campaign};
-            -Response Requirements: в своём ответе укажи только текст для кампании;
-            -Language: {campaign.ad_title}"
             
         let client = new HttpClient()
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {key}")
@@ -85,4 +76,38 @@ let genTextFromML (dbContext: PromountContext) (advertiserId: Guid) (campaignId:
             else None)
         |> Option.defaultValue "Все модели сейчас недоступны, попробуй позже"
         |> Success
+    }
+
+let genTextFromML (dbContext: PromountContext) (advertiserId: Guid) (campaignId: Guid) = async {
+        let! advertiser = dbContext.Advertisers.FindAsync(advertiserId).AsTask() |> Async.AwaitTask
+        let! campaign = dbContext.Campaigns.FindAsync(campaignId).AsTask() |> Async.AwaitTask
+        let campaign = campaign.GetCampaign()
+        
+        let input =
+            $"-Context: Создай текст для рекламной кампании {advertiser};
+            Информация: {campaign};
+            -Response Requirements: в своём ответе укажи только текст для кампании;
+            -Language: {campaign.ad_title}"
+            
+        return! requestToModel input
+    }
+
+let moderateTextFromML (dbContext: PromountContext) (advertiserId: Guid) (campaignId: Guid) = async {
+        let! advertiser = dbContext.Advertisers.FindAsync(advertiserId).AsTask() |> Async.AwaitTask
+        let! campaign = dbContext.Campaigns.FindAsync(campaignId).AsTask() |> Async.AwaitTask
+        let campaign = campaign.GetCampaign()
+        
+        let input =
+            $"-Context: Проверь текст рекламной кампании {advertiser} на
+                Severe Toxicity
+                Insult
+                Profanity
+                Identity attack
+                Threat
+                Sexually explicit;
+            Информация: {campaign};
+            Учитывай целевой возраст аудитории для которой будет показываться реклама;
+            -Response Requirements: в своём ответе укажи только дробное число от 0 до 1 (степень токсичности) и ничего больше;"
+            
+        return! requestToModel input
     }

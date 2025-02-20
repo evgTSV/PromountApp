@@ -17,6 +17,7 @@
       <Compile Include="Models.fs" />
       <Compile Include="PromountContext.fs" />
       <Compile Include="ML.fs" />
+      <Compile Include="ModerationAPI.fs" />
       <Compile Include="Services\ObjectStorage.fs" />
       <Compile Include="Services\ClientsService.fs" />
       <Compile Include="Services\AdvertisersService.fs" />

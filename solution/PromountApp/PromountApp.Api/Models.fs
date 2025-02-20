@@ -110,6 +110,7 @@ type Campaign = {
     override this.ToString() =
         $"Рекламная кампания {this.ad_title}:
             Продолжительность - с {this.start_date} по {this.end_date};
+            Описание - {this.ad_text};
             {this.targeting}"
             
     interface IValidatable with
