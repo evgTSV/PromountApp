@@ -108,40 +108,35 @@ let inBanList (adId: Guid) (dbContext: PromountContext)= async {
     return result > 0
 }
 
-let private semaphore = new SemaphoreSlim(1, 1)   
 let getCampaignStatistics (dbContext: PromountContext, timeService: TimeConfig) (client: Client) (adCampaign: CampaignDb) = task {
-    do! semaphore.WaitAsync()
-    try
-        let staticsService = StatisticsService(dbContext, timeService) :> IStatisticsService
-        match! staticsService.GetCampaignStats(adCampaign.campaign_id) with
-        | Success stats ->
-            let! mlScore =
-                dbContext.MLScores
-                    .Where(fun ml -> ml.client_id = client.client_id && ml.advertiser_id = adCampaign.advertiser_id)
-                    .ToArrayAsync()
-            let mlScore = mlScore |> Array.tryHead |> Option.map _.score |> Option.defaultValue 0
-            let! inBan = inBanList adCampaign.campaign_id dbContext
-            let scores = {
-                campaign_id = adCampaign.campaign_id
-                ml_score = mlScore
-                ad_cost = costPerAd adCampaign
-                ad_progress = adProgress adCampaign stats
-                out_of_limits_impression = isOutOfImpressionLimit stats adCampaign
-                out_of_limits_click = isOutOfClickLimit stats adCampaign
-                in_ban_list = inBan
-            }
-            return Some (adCampaign, scores)
-        | _ ->
-            return None
-    finally
-        semaphore.Release() |> ignore
+    let staticsService = StatisticsService(dbContext, timeService) :> IStatisticsService
+    match! staticsService.GetCampaignStats(adCampaign.campaign_id) with
+    | Success stats ->
+        let! mlScore =
+            dbContext.MLScores
+                .Where(fun ml -> ml.client_id = client.client_id && ml.advertiser_id = adCampaign.advertiser_id)
+                .ToArrayAsync()
+        let mlScore = mlScore |> Array.tryHead |> Option.map _.score |> Option.defaultValue 0
+        let! inBan = inBanList adCampaign.campaign_id dbContext
+        let scores = {
+            campaign_id = adCampaign.campaign_id
+            ml_score = mlScore
+            ad_cost = costPerAd adCampaign
+            ad_progress = adProgress adCampaign stats
+            out_of_limits_impression = isOutOfImpressionLimit stats adCampaign
+            out_of_limits_click = isOutOfClickLimit stats adCampaign
+            in_ban_list = inBan
+        }
+        return Some (adCampaign, scores)
+    | _ ->
+        return None
 }
     
 let getBestCampaignWithValidTarget (client: Client) (dbContext: PromountContext, timeService: TimeConfig)= task {
     try
         let services = dbContext, timeService
         let bestTargets =
-              dbContext.Campaigns
+              dbContext.Campaigns.AsEnumerable()
                   .Where(isActive (timeService.GetTotalDays()))
                   .Where(checkTargets client)
                   
@@ -161,7 +156,7 @@ let getBestCampaignWithValidTarget (client: Client) (dbContext: PromountContext,
 }
 
 let getCommonCampaign (dbContext: PromountContext, timeService: TimeConfig) = task {
-    return dbContext.Campaigns
+    return dbContext.Campaigns.AsEnumerable()
                 .Where(isActive (timeService.GetTotalDays()))
                 .Where(isCommon)
                 .ToArray()
