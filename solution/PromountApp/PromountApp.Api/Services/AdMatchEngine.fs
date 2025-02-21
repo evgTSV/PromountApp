@@ -142,7 +142,6 @@ let getBestCampaignWithValidTarget (client: Client) (dbContext: PromountContext,
         let services = dbContext, timeService
         let bestTargets =
               dbContext.Campaigns.AsParallel()
-                  .WithExecutionMode(ParallelExecutionMode.ForceParallelism)
                   .WithDegreeOfParallelism(degreeOfParallel)
                   .Where(isActive (timeService.GetTotalDays()))
                   .Where(checkTargets client)
@@ -164,7 +163,6 @@ let getBestCampaignWithValidTarget (client: Client) (dbContext: PromountContext,
 
 let getCommonCampaign (dbContext: PromountContext, timeService: TimeConfig) = task {
     return dbContext.Campaigns.AsParallel()
-                .WithExecutionMode(ParallelExecutionMode.ForceParallelism)
                 .WithDegreeOfParallelism(degreeOfParallel)
                 .Where(isActive (timeService.GetTotalDays()))
                 .Where(isCommon)
@@ -180,7 +178,6 @@ let getBestCampaignByScores (bestTarget: ScoresCategories option) (scores: Dicti
         
     let bestCommonAdCampaigns =
         scores
-        |> PSeq.withExecutionMode ParallelExecutionMode.ForceParallelism
         |> PSeq.withDegreeOfParallelism degreeOfParallel
         |> PSeq.filter (fun s ->
              s.Value |> isBest bestTargetScores)
@@ -206,6 +203,7 @@ let getBestCampaign (client: Client) (dbContext: PromountContext, timeService: T
     let! commonCampaigns = commonCampaignsTask
     let commonCampaigns =
         commonCampaigns
+        |> PSeq.withDegreeOfParallelism degreeOfParallel
         |> PSeq.choose (fun bt -> getCampaignStatistics services client bt |> _.Result)
         |> PSeq.filter (snd >> _.out_of_limits_impression >> not)
         |> PSeq.filter (snd >> _.in_ban_list >> not)
