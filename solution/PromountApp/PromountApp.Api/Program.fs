@@ -52,19 +52,23 @@ module Program =
     
     let configureOTel (services: IServiceCollection) =
         let histogram = ExplicitBucketHistogramConfiguration()
-        histogram.Boundaries <- [| 0; 0.01; 0.1; 1; 10 |]
+        histogram.Boundaries <- [| 0; 0.005; 0.01; 0.025; 0.05; 0.075; 0.1; 0.25; 0.5; 0.75; 1; 2.5; 5; 7.5; 10 |]
         services.AddOpenTelemetry()
             .WithMetrics(fun builder ->
                 builder
                     .AddPrometheusExporter()
                     .AddRuntimeInstrumentation()
                     .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddNpgsqlInstrumentation()
                     .AddProcessInstrumentation()
                     .AddMeter(
                            "Microsoft.AspNetCore.Hosting",
                            "Microsoft.AspNetCore.Server.Kestrel",
                            "Microsoft.AspNetCore.Http.Connections",
-                           "Microsoft.AspNetCore.Routing")
+                           "Microsoft.AspNetCore.Routing",
+                           "Microsoft.AspNetCore.Diagnostics",
+                           "Microsoft.AspNetCore.RateLimiting")
                     .AddView("request-duration", histogram)
                 |> ignore)
             
@@ -72,7 +76,7 @@ module Program =
         Log.Logger <- LoggerConfiguration()
             .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
             .Enrich.FromLogContext()
-            // .WriteTo.GrafanaLoki("http://loki:3100")
+            .WriteTo.GrafanaLoki("http://loki:3100")
             .WriteTo.Console()
             .CreateLogger()
         services.AddLogging(fun builder -> builder.AddSerilog(dispose = true) |> ignore) |> ignore
