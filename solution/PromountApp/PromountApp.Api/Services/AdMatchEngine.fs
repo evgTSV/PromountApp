@@ -141,18 +141,17 @@ let getBestCampaignWithValidTarget (client: Client) (dbContext: PromountContext,
     try
         let services = dbContext, timeService
         let bestTargets =
-              dbContext.Campaigns.AsParallel()
-                  .WithDegreeOfParallelism(degreeOfParallel)
+              dbContext.Campaigns
                   .Where(isActive (timeService.GetTotalDays()))
                   .Where(checkTargets client)
                   
         let bestTarget =
             bestTargets
-            |> PSeq.choose ((getCampaignStatistics services client) >> _.Result)
-            |> PSeq.filter (snd >> _.out_of_limits_impression >> not)
-            |> PSeq.filter (snd >> _.in_ban_list >> not)
-            |> PSeq.groupBy (fst >> getTargetsScore client)
-            |> PSeq.maxBy fst
+            |> Seq.choose ((getCampaignStatistics services client) >> _.Result)
+            |> Seq.filter (snd >> _.out_of_limits_impression >> not)
+            |> Seq.filter (snd >> _.in_ban_list >> not)
+            |> Seq.groupBy (fst >> getTargetsScore client)
+            |> Seq.maxBy fst
             |> snd
             |> Seq.maxBy (fst >> costPerAd)
                   
@@ -162,8 +161,7 @@ let getBestCampaignWithValidTarget (client: Client) (dbContext: PromountContext,
 }
 
 let getCommonCampaign (dbContext: PromountContext, timeService: TimeConfig) = task {
-    return dbContext.Campaigns.AsParallel()
-                .WithDegreeOfParallelism(degreeOfParallel)
+    return dbContext.Campaigns
                 .Where(isActive (timeService.GetTotalDays()))
                 .Where(isCommon)
                 .ToArray()
@@ -178,13 +176,12 @@ let getBestCampaignByScores (bestTarget: ScoresCategories option) (scores: Dicti
         
     let bestCommonAdCampaigns =
         scores
-        |> PSeq.withDegreeOfParallelism degreeOfParallel
-        |> PSeq.filter (fun s ->
+        |> Seq.filter (fun s ->
              s.Value |> isBest bestTargetScores)
-        |> PSeq.filter (fun g -> g.Key <> Guid.Empty)
-        |> PSeq.groupBy _.Value.ad_progress
-        |> PSeq.sortBy fst
-        |> PSeq.toArray
+        |> Seq.filter (fun g -> g.Key <> Guid.Empty)
+        |> Seq.groupBy _.Value.ad_progress
+        |> Seq.sortBy fst
+        |> Seq.toArray
         |> Array.tryHead
         
     bestCommonAdCampaigns |> Option.bind (fun ads ->
@@ -203,12 +200,11 @@ let getBestCampaign (client: Client) (dbContext: PromountContext, timeService: T
     let! commonCampaigns = commonCampaignsTask
     let commonCampaigns =
         commonCampaigns
-        |> PSeq.withDegreeOfParallelism degreeOfParallel
-        |> PSeq.choose (fun bt -> getCampaignStatistics services client bt |> _.Result)
-        |> PSeq.filter (snd >> _.out_of_limits_impression >> not)
-        |> PSeq.filter (snd >> _.in_ban_list >> not)
-        |> PSeq.map (fun (c, s) -> (c.campaign_id, s))
-        |> PSeq.fold (fun (acc: Dictionary<_,_>) (key, value) ->
+        |> Seq.choose (fun bt -> getCampaignStatistics services client bt |> _.Result)
+        |> Seq.filter (snd >> _.out_of_limits_impression >> not)
+        |> Seq.filter (snd >> _.in_ban_list >> not)
+        |> Seq.map (fun (c, s) -> (c.campaign_id, s))
+        |> Seq.fold (fun (acc: Dictionary<_,_>) (key, value) ->
             acc[key] <- value
             acc
         ) (Dictionary<Guid, ScoresCategories>())
