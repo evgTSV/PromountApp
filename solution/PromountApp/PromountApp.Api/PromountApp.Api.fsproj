@@ -6,10 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include=".dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-      <Content Include="Dockerfile" />
       <Compile Include="AssemblyInfo.fs" />
       <Compile Include="Utils.fs" />
       <Compile Include="TimeConfig.fs" />

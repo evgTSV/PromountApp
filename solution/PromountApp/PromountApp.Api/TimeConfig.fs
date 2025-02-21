@@ -8,7 +8,9 @@ type TimeConfig(cache: IDistributedCache) =
     let cacheTimeKey = "app:time"
     
     member this.CurrentTime
-        with get() = TimeSpan.FromDays(cache.GetString(cacheTimeKey) |> int)
+        with get() =
+            let days = cache.GetString(cacheTimeKey) |> defaultIfNull "0" |> int
+            TimeSpan.FromDays(days)
         and set (v : TimeSpan) =
             let dateStr = v.TotalDays.ToString()
             cache.SetString(cacheTimeKey, dateStr)

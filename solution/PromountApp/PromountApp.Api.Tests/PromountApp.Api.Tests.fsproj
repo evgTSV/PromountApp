@@ -11,7 +11,6 @@
         <Compile Include="Helpers.fs" />
         <Compile Include="StringLogger.fs" />
         <Compile Include="TestContainers.fs" />
-        <Compile Include="TestAdMatchEngine.fs" />
         <Compile Include="ClientsServiceTests.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
@@ -20,6 +19,7 @@
         <PackageReference Include="AspNetCore.Yandex.ObjectStorage" Version="0.2.2" />
         <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />
         <PackageReference Include="FSharp.Quotations.Evaluator" Version="2.1.0" />
+        <PackageReference Include="JetBrains.Lifetimes" Version="2025.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.2" />
@@ -36,6 +36,7 @@
         <PackageReference Include="Testcontainers.PostgreSql" Version="4.2.0" />
         <PackageReference Include="Testcontainers.Redis" Version="4.2.0" />
         <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="Xunit.Extensions.AssemblyFixture" Version="2.6.0" />
         <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>

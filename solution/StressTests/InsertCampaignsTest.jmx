@@ -10,55 +10,20 @@
     </TestPlan>
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Users">
-        <intProp name="ThreadGroup.num_threads">1000</intProp>
+        <intProp name="ThreadGroup.num_threads">10</intProp>
         <intProp name="ThreadGroup.ramp_time">5</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">stopthread</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
-          <stringProp name="LoopController.loops">1</stringProp>
+          <stringProp name="LoopController.loops">10</stringProp>
           <boolProp name="LoopController.continue_forever">false</boolProp>
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="ClientsGen1000" enabled="true">
-          <stringProp name="cacheKey">true</stringProp>
-          <stringProp name="filename"></stringProp>
-          <stringProp name="parameters"></stringProp>
-          <stringProp name="script">import java.util.UUID
-import groovy.json.JsonOutput
-
-def generateUUID() {
-    return UUID.randomUUID()
-}
-
-def generateClientObject(index) {
-    return [
-        &quot;client_id&quot;: generateUUID(),
-        &quot;login&quot;: &quot;string$index&quot;,
-        &quot;age&quot;: 100,
-        &quot;location&quot;: &quot;string&quot;,
-        &quot;gender&quot;: &quot;MALE&quot;
-    ]
-}
-
-def clients = []
-
-for (i in 1..1000) {
-    clients.add(generateClientObject(i))
-}
-
-
-def json = JsonOutput.toJson(clients)
-
-vars.put(&quot;generated_json&quot;, json)
-</stringProp>
-          <stringProp name="scriptLanguage">groovy</stringProp>
-        </JSR223PreProcessor>
-        <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Insert clients" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Insert clients">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
-          <stringProp name="HTTPSampler.path">/clients/bulk</stringProp>
+          <stringProp name="HTTPSampler.path">/advertisers/bulk</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -74,7 +39,38 @@ vars.put(&quot;generated_json&quot;, json)
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="AdvertiserGen1">
+            <stringProp name="cacheKey">false</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">import java.util.UUID
+import groovy.json.JsonOutput
+
+def generateUUID() {
+    return UUID.randomUUID()
+}
+
+def generateAdvertiserObject(index) {
+    return [
+        &quot;advertiser_id&quot;: generateUUID(),
+        &quot;name&quot;: &quot;string$index&quot;
+    ]
+}
+
+def advertisers = []
+
+for (int i = 0; i &lt; 1; i++) {
+	advertisers.add(generateAdvertiserObject(52))
+}
+
+def json = JsonOutput.toJson(advertisers)
+
+vars.put(&quot;generated_json&quot;, json)
+</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -111,7 +107,7 @@ vars.put(&quot;generated_json&quot;, json)
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
+          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -148,9 +144,9 @@ vars.put(&quot;generated_json&quot;, json)
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract client_id">
-            <stringProp name="JSONPostProcessor.referenceNames">extracted_client_id</stringProp>
-            <stringProp name="JSONPostProcessor.jsonPathExprs">$.[0].client_id</stringProp>
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract advertiser_id">
+            <stringProp name="JSONPostProcessor.referenceNames">extracted_advertiser_id</stringProp>
+            <stringProp name="JSONPostProcessor.jsonPathExprs">$.[0].advertiser_id</stringProp>
             <stringProp name="JSONPostProcessor.match_numbers"></stringProp>
             <stringProp name="Scope.variable">client_id</stringProp>
             <stringProp name="Sample.scope">all</stringProp>
@@ -158,18 +154,24 @@ vars.put(&quot;generated_json&quot;, json)
           </JSONPostProcessor>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request">
-          <stringProp name="HTTPSampler.path">http://localhost:80/clients/${extracted_client_id}</stringProp>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create campaign">
+          <stringProp name="HTTPSampler.path">http://localhost:80/advertisers/${extracted_advertiser_id}/campaigns</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-            <collectionProp name="Arguments.arguments"/>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${generated_json}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -206,7 +208,7 @@ vars.put(&quot;generated_json&quot;, json)
             <stringProp name="filename"></stringProp>
           </ResultCollector>
           <hashTree/>
-          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
+          <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table">
             <boolProp name="ResultCollector.error_logging">false</boolProp>
             <objProp>
               <name>saveConfig</name>
@@ -242,6 +244,43 @@ vars.put(&quot;generated_json&quot;, json)
             </objProp>
             <stringProp name="filename"></stringProp>
           </ResultCollector>
+          <hashTree/>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="CampaignGen">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">import java.util.UUID
+import java.util.Random
+import groovy.json.JsonOutput
+
+def random = new Random()
+def impress = random.nextInt(20) + 1
+
+def generateCampaignObject(index, random, impress) {
+    return [
+        &quot;impressions_limit&quot;: impress,
+        &quot;clicks_limit&quot;: random.nextInt(impress) + 1,
+        &quot;cost_per_impression&quot;: random.nextInt(20) + 1,
+        &quot;cost_per_click&quot;: random.nextInt(20) + 1,
+        &quot;ad_title&quot;: &quot;string$index&quot;,
+        &quot;ad_text&quot;: &quot;string$index&quot;,
+        &quot;start_date&quot;: 0,
+        &quot;end_date&quot;: 100,
+        &quot;targeting&quot;: [:]
+    ]
+}
+
+def campaigns = generateCampaignObject(52, random, impress)
+
+def json = JsonOutput.toJson(campaigns)
+
+vars.put(&quot;generated_json&quot;, json)
+
+// Выводим результат для отладки
+log.info(&quot;Generated campaigns JSON: ${json}&quot;)
+</stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PreProcessor>
           <hashTree/>
         </hashTree>
         <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">

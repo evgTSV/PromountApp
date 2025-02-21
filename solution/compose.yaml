@@ -1,13 +1,9 @@
 ﻿services:
   web:
-    image: promountweb
     build:
-      context: PromountApp/PromountApp.Api
-      dockerfile: Dockerfile
+      context: ./PromountApp/PromountApp.Api
+      dockerfile: ./Dockerfile
     restart: always
-    depends_on:
-      - db
-      - redis
     ports:
       - "80:8080"
       - "8080:8080"
@@ -17,13 +13,10 @@
       - mynetwork
   
   bot:
-    image: promountbot
     build:
-      context: PromountApp/PromountApp.Bot
-      dockerfile: Dockerfile
+      context: ./PromountApp/PromountApp.Bot
+      dockerfile: ./Dockerfile
     restart: always
-    depends_on:
-      - web
     ports:
       - "8081:8080"
     env_file:
@@ -46,8 +39,6 @@
   redis:
     image: redis:latest
     restart: always
-    volumes:
-      - ./redisdata:/data
     environment:
       REDIS_URL: redis:6379
     ports:
