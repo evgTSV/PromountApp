@@ -54,7 +54,6 @@
     depends_on:
       - prometheus
       - jaeger
-      - elasticsearch
     ports:
       - "3000:3000"
     volumes:
@@ -103,7 +102,7 @@
 
   elasticsearch:
     restart: always
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.4
+    image: elastic/elasticsearch:9.0.0-beta1
     environment:
       - discovery.type=single-node
     volumes:
