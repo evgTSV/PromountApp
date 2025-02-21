@@ -53,7 +53,6 @@
     restart: always
     depends_on:
       - prometheus
-      - jaeger
     ports:
       - "3000:3000"
     volumes:
@@ -73,45 +72,6 @@
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
       - mynetwork
-        
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
-    volumes:
-      - ./loki-config.yaml:/etc/loki/local-config.yaml
-    networks:
-      - mynetwork
-
-  jaeger:
-    restart: always
-    image: jaegertracing/all-in-one:latest
-    depends_on:
-      - elasticsearch
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-      - SPAN_STORAGE_TYPE=elasticsearch
-      - ES_SERVER_URLS=http://elasticsearch:9200
-    networks:
-      - mynetwork
-    ports:
-      - "4317:4317"
-      - "16686:16686"
-      - "4318:4318"
-
-  elasticsearch:
-    restart: always
-    image: elastic/elasticsearch:9.0.0-beta1
-    environment:
-      - discovery.type=single-node
-    volumes:
-      - ./grafana:/usr/share/elasticsearch/data
-      - ./elasticsearch/conf.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-    networks:
-      - mynetwork
-    ports:
-      - "9200:9200"
 
 networks:
   mynetwork:
