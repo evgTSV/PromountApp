@@ -182,7 +182,7 @@ let getBestCampaignByScores (bestTarget: ScoresCategories option) (scores: Dicti
         else
             None)
     
-let semaphore = new SemaphoreSlim(2, 2)
+let semaphore = new SemaphoreSlim(4, 4)
 let getBestCampaign (client: Client) (dbContext: PromountContext, timeService: TimeConfig) = task {
     try
         do! semaphore.WaitAsync()
