@@ -19,13 +19,13 @@ let private gender_score = 0.4
 [<Literal>]
 let private location_score = 0.2
 [<Literal>]
-let private costPerImpression_ratio = 0.7
+let private costPerImpression_ratio = 0.6
 [<Literal>]
-let private costPerClick_ratio = 0.3
+let private costPerClick_ratio = 0.4
 [<Literal>]
-let private impressionsProgress_ratio = 0.4
+let private impressionsProgress_ratio = 0.2
 [<Literal>]
-let private clicksProgress_ratio = 0.6
+let private clicksProgress_ratio = 0.8
 
 type ScoresCategories = {
     campaign_id: Guid
