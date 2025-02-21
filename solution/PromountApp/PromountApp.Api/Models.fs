@@ -140,7 +140,7 @@ module Models =
         [<Required>]
         score: int
     }
-      
+    
     [<CLIMutable>]
     type Targeting = {
         gender: string | null
@@ -162,7 +162,7 @@ module Models =
                 && ((this.age_from.HasValue && this.age_to.HasValue) |> not
                     || this.age_from.Value <= this.age_to.Value)
                 && this.location |> validateOption' (requiresTextLength (1, 1000))
-                
+            
     [<CLIMutable>]
     type Campaign = {
         [<Required>]

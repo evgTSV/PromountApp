@@ -12,7 +12,10 @@
         <Compile Include="StringLogger.fs" />
         <Compile Include="TestContainers.fs" />
         <Compile Include="ClientsServiceTests.fs" />
+        <Compile Include="AdvertisersServiceTests.fs" />
+        <Compile Include="CampaignEndpointsTests.fs" />
         <Compile Include="Program.fs"/>
+        <Content Include="xunit.runner.json" />
     </ItemGroup>
 
     <ItemGroup>

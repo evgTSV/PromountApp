@@ -25,6 +25,11 @@ let isSuccessStatusCode (statusCode: HttpStatusCode) =
 type Response<'a> =
     | Error of HttpStatusCode
     | Success of 'a * HttpStatusCode
+    with
+        member this.GetData() =
+            match this with
+            | Success (data, _) -> data
+            | Error code -> failwith $"Response includes error: {code.ToString()}"
     
 module TestMonad =
     [<RequireQualifiedAccess>]
@@ -103,6 +108,23 @@ let arraysEquivalent (arr1: 'a array) (arr2: 'a array) =
             | Some count -> Map.add elem (count + 1) acc
             | None -> Map.add elem 1 acc
         ) Map.empty
+    let counts1 = countElements arr1
+    let counts2 = countElements arr2
+    counts1 = counts2
+    
+let arraysEquivalent' (comparator: 'a -> 'a -> bool) (arr1: 'a array) (arr2: 'a array) =
+    let countElements (arr: 'a array) =
+        arr
+        |> Array.fold (fun acc elem ->
+            let count = 
+                acc 
+                |> List.tryFind (fun (key, _) -> comparator key elem) 
+                |> function
+                    | Some (_, count) -> count + 1
+                    | None -> 1
+            (elem, count) :: acc |> List.distinctBy fst
+        ) []
+    
     let counts1 = countElements arr1
     let counts2 = countElements arr2
     counts1 = counts2

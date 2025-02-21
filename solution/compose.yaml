@@ -7,6 +7,9 @@
     ports:
       - "80:8080"
       - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
     env_file:
       - .env
     networks:
@@ -35,6 +38,11 @@
       - "5432:5432"
     networks:
       - mynetwork
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 1s
+      timeout: 1s
+      retries: 5
       
   redis:
     image: redis:latest
