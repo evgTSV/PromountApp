@@ -21,6 +21,7 @@
     <ItemGroup>
         <PackageReference Include="AspNetCore.Yandex.ObjectStorage" Version="0.2.2" />
         <PackageReference Include="FSharp.Collections.ParallelSeq" Version="1.2.0" />
+        <PackageReference Include="FSharp.Data.Validator" Version="9.0.2" />
         <PackageReference Include="FSharp.Quotations.Evaluator" Version="2.1.0" />
         <PackageReference Include="JetBrains.Lifetimes" Version="2025.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.2" />
@@ -30,6 +31,7 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0-preview-25107-01" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Npgsql" Version="9.0.2" />
         <PackageReference Include="Npgsql.DependencyInjection" Version="9.0.2" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />

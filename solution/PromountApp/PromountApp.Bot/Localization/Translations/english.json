@@ -6,6 +6,10 @@
   "WelcomeText": "%s, the bot of the advertising campaign promotion system welcomes you!\n\n <b>Sign In</b> or <b>Sign Up</b>",
   "LoginButtonText": "Sign In",
   "RegisterButtonText": "Sing Up",
+  "LoginInputTipText": "Enter your ID",
+  "RegisterInputTipText": "Create your name",
+  "SuccessAuthText": "Success! Your ID is %s",
+  "ErrorText": "Error: %s",
   "ConsoleHomeText": "Welcome <b>%s</b> in the control menu!\nCreate, edit, and track your advertising campaigns",
   "CreateCampaignButtonText": "Create campaign"
 }

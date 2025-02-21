@@ -6,6 +6,10 @@
   "WelcomeText": "%s, 광고 홍보 시스템의 봇이 당신을 환영합니다!\n\n<b>로그인</b> 또는 <b>등록</b>\n\n <b>경애하는 최고령도자 김정은동지 만세!</b> ",
   "LoginButtonText": "로그인",
   "RegisterButtonText": "등록",
+  "LoginInputTipText": "아이디를 입력하세요",
+  "RegisterInputTipText": "이름을 만드십시오",
+  "SuccessAuthText": "성공! 귀하의 ID는 %s",
+  "ErrorText": "오류: %s",
   "ConsoleHomeText": "<b>%s</b> 를 제어 메뉴에 오신 것을 환영합니다!\n광고 캠페인을 만들고, 편집하고, 추적하세요",
   "CreateCampaignButtonText": "캠페인 만들기"
 }

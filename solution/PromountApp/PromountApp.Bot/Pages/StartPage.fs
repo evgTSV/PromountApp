@@ -17,7 +17,7 @@ type StartPage(inbox: BotMailbox) =
                         Lang = defaultLang
                     }
                     inbox.Post(Command.SelectLang, ctx)
-                    return SelectLangPage(state, inbox, fun s -> AuthPage(s, inbox))
+                    return SelectLangPage(state, inbox, fun s -> AuthPage(s, inbox, AuthPageState.Start))
                 | _ -> return this
             | _ ->
                 return this

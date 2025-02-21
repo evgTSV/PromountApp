@@ -12,11 +12,15 @@
       </Content>
       <Content Include="Dockerfile" />
       <Compile Include="Utils.fs" />
+      <Compile Include="Models.fs" />
       <Compile Include="Localization\Translator.fs" />
       <Content Include="Localization\Translations\*.json" CopyToOutputDirectory="Always" />
       <Compile Include="Controls.fs" />
       <Compile Include="Keyboards.fs" />
+      <Compile Include="Controllers\BaseController.fs" />
+      <Compile Include="Controllers\AdvertiserController.fs" />
       <Compile Include="Pages\IPage.fs" />
+      <Compile Include="Pages\AdvertiserPage.fs" />
       <Compile Include="Pages\AuthPage.fs" />
       <Compile Include="Pages\SelectLangPage.fs" />
       <Compile Include="Pages\StartPage.fs" />
@@ -25,9 +29,11 @@
 
     <ItemGroup>
       <PackageReference Include="FSharp.Data" Version="6.4.1" />
+      <PackageReference Include="FSharp.Data.Validator" Version="9.0.2" />
       <PackageReference Include="FSharp.Quotations.Evaluator" Version="2.1.0" />
       <PackageReference Include="Funogram" Version="3.0.2" />
       <PackageReference Include="Funogram.Telegram" Version="8.3.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
 </Project>

@@ -6,6 +6,10 @@
   "WelcomeText": "%s, вас приветствует бот системы продвижения рекламы!\n\n<b>Войдите</b> или <b>Зарегистрируйтесь</b>",
   "LoginButtonText": "Вход",
   "RegisterButtonText": "Регистрация",
+  "LoginInputTipText": "Введите свой ID",
+  "RegisterInputTipText": "Придумайте своё имя",
+  "SuccessAuthText": "Успех! Ваш id - %s",
+  "ErrorText": "Ошибка: %s",
   "ConsoleHomeText": "Добро пожаловать <b>%s</b> в меню управления!\nСоздавайте, редактируйте, отслеживайте свои рекламные кампании",
   "CreateCampaignButtonText": "Создать кампанию"
 }
