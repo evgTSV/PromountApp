@@ -9,11 +9,11 @@ COPY ["PromountApp.Bot.fsproj", "./"]
 RUN dotnet restore "PromountApp.Bot.fsproj"
 WORKDIR "/src/PromountApp.Bot"
 COPY . .
-RUN dotnet build "PromountApp.Bot.fsproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "PromountApp.Bot.fsproj" -c Release -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "PromountApp.Bot.fsproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "PromountApp.Bot.fsproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
