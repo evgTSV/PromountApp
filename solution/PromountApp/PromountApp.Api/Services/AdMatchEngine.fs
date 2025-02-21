@@ -13,19 +13,19 @@ open PromountApp.Api.Utils
 open Microsoft.EntityFrameworkCore
 
 [<Literal>]
-let private age_score = 0.5
+let private age_score = 0.4
 [<Literal>]
-let private gender_score = 0.3
+let private gender_score = 0.4
 [<Literal>]
 let private location_score = 0.2
 [<Literal>]
-let private costPerImpression_ratio = 0.4
+let private costPerImpression_ratio = 0.7
 [<Literal>]
-let private costPerClick_ratio = 0.6
+let private costPerClick_ratio = 0.3
 [<Literal>]
-let private impressionsProgress_ratio = 0.3
+let private impressionsProgress_ratio = 0.1
 [<Literal>]
-let private clicksProgress_ratio = 0.7
+let private clicksProgress_ratio = 0.9
 
 type ScoresCategories = {
     campaign_id: Guid
@@ -143,8 +143,7 @@ let getBestCampaignWithValidTarget (client: Client) (dbContext: PromountContext,
         let bestTarget =
             bestTargets
             |> Seq.choose ((getCampaignStatistics services client) >> _.Result)
-            |> Seq.filter (snd >> _.out_of_limits_impression >> not)
-            |> Seq.filter (snd >> _.in_ban_list >> not)
+            |> Seq.filter (snd >> (_.out_of_limits_impression >> not |&&| _.in_ban_list >> not))
             |> Seq.groupBy (fst >> getTargetsScore client)
             |> Seq.maxBy fst
             |> snd
@@ -157,9 +156,7 @@ let getBestCampaignWithValidTarget (client: Client) (dbContext: PromountContext,
 
 let getCommonCampaign (dbContext: PromountContext, timeService: TimeConfig) = task {
     return dbContext.Campaigns.AsEnumerable()
-                .Where(isActive (timeService.GetTotalDays()))
-                .Where(isCommon)
-                .ToArray()
+                |> Seq.filter(isActive (timeService.GetTotalDays()) |&&| isCommon)
 }
  
 let getBestCampaignByScores (bestTarget: ScoresCategories option) (scores: Dictionary<Guid, ScoresCategories>)=
@@ -176,8 +173,7 @@ let getBestCampaignByScores (bestTarget: ScoresCategories option) (scores: Dicti
         |> Seq.filter (fun g -> g.Key <> Guid.Empty)
         |> Seq.groupBy _.Value.ad_progress
         |> Seq.sortBy fst
-        |> Seq.toArray
-        |> Array.tryHead
+        |> Seq.tryHead
         
     bestCommonAdCampaigns |> Option.bind (fun ads ->
         if ads |> (snd >> Seq.isEmpty  >> not) then
