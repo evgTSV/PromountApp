@@ -17,22 +17,30 @@ open PromountApp.Bot.Utils
 let states = ConcurrentDictionary<int64, BotMailbox>()
 
 let advertisersState() = MailboxProcessor.Start(fun inbox ->
-        let rec loop (page: IPage option) = async {
+        let rec loop (page: IPage option, pred: IPage list) = async {
             let! command, ctx = inbox.Receive()
-            let! newState = 
-                async {
-                    match page with
-                    | Some page ->
-                        return! page.OnMassageHandler ctx command
-                    | None ->
-                        inbox.Post(Command.Start, ctx)
-                        return StartPage(inbox)
-                }
+            match command with
+            | Back ->
+                return! loop(pred |> List.tryHead, match pred with | [] -> [] | _ -> pred |> List.tail)
+            | _ ->
+                let! newState = 
+                    async {
+                        match page with
+                        | Some page ->
+                            return! page.OnMassageHandler ctx command
+                        | None ->
+                            inbox.Post(Command.Start, ctx)
+                            return Some (StartPage(inbox))
+                    }
 
-            return! loop (Some newState)
+                if newState.IsNone then 
+                    return! loop (page, pred)
+                else
+                    return! loop (newState,
+                                 page |> Option.map (fun p -> p :: pred) |> Option.defaultValue pred)
         }
         
-        loop None
+        loop (None, [])
     )
 
 let onMessage (ctx: UpdateContext) =

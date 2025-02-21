@@ -19,7 +19,9 @@
       <Compile Include="Keyboards.fs" />
       <Compile Include="Controllers\BaseController.fs" />
       <Compile Include="Controllers\AdvertiserController.fs" />
+      <Compile Include="Controllers\StatsController.fs" />
       <Compile Include="Pages\IPage.fs" />
+      <Compile Include="Pages\CommonStatsPage.fs" />
       <Compile Include="Pages\AdvertiserPage.fs" />
       <Compile Include="Pages\AuthPage.fs" />
       <Compile Include="Pages\SelectLangPage.fs" />

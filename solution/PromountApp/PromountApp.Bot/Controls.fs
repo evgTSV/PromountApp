@@ -9,6 +9,7 @@ type Command =
     | SelectLang
     | ChangeLang of string
     | NewMessage
+    | Back
     
 type UserState = {
     User: User

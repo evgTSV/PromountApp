@@ -25,7 +25,7 @@ type BaseController() =
             else
                 return Error response.StatusCode
         with
-        | _ -> return Error HttpStatusCode.InternalServerError
+        | ex -> return Error HttpStatusCode.InternalServerError
     }
     
     member this.Post<'a, 'b> (url: string) (data: 'a) : Task<ControllerResponse<'b>> = task {

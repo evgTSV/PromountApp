@@ -13,7 +13,24 @@ type AdvertiserPage(userState: UserState, inbox: BotMailbox, advertiser: Adverti
     
     interface IPage with
         member this.OnMassageHandler ctx command = async {
-            sendMessage userState.User.Id (sprintf (Printf.StringFormat<_>(userState.Lang.ConsoleHomeText))
-                                                           advertiser.name) ctx
-            return this
+            match ctx.Update.CallbackQuery with
+            | Some { Data = Some callback } ->
+                match callback with
+                | s when s = createCampaignOutput ->
+                    return None
+                | s when s = commonStatsOutput ->
+                    return Some (CommonStatsPage(userState, inbox, advertiser))
+                | s when s = campaignsListOutput ->
+                    return None
+                | s when s = advertiserExitOutput ->
+                    inbox.Post(Command.Back, ctx)
+                    inbox.Post(Command.Start, ctx)
+                    return None
+                | _ ->
+                    return None
+            | _ ->    
+                let keyboard = advertiserHomeKeyboard userState.Lang
+                sendMessageMarkup userState.User.Id (sprintf (Printf.StringFormat<_>(userState.Lang.ConsoleHomeText))
+                                                               advertiser.name) keyboard ctx
+                return None
         }    

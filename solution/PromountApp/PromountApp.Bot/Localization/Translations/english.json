@@ -11,5 +11,15 @@
   "SuccessAuthText": "Success! Your ID is %s",
   "ErrorText": "Error: %s",
   "ConsoleHomeText": "Welcome <b>%s</b> in the control menu!\nCreate, edit, and track your advertising campaigns",
-  "CreateCampaignButtonText": "Create campaign"
+  "CreateCampaignButtonText": "Create campaign",
+  "ExitFromAccountButtonText": "Exit",
+  "GetCampaignListButton": "My Campaigns",
+  "GetCommonStatsButton": "Statistics",
+  "BackButton": "Back",
+  "ImpressionCountText": "Impressions: ",
+  "ClickCountText": "Clicks: ",
+  "ConversionText": "Conversion: ",
+  "ImpressionSpentText": "Spent on Impressions: ",
+  "ClickSpentText": "Spent on Clicks: ",
+  "TotalSpentText": "Total Spent: "
 }

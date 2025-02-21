@@ -5,4 +5,4 @@ open Funogram.Telegram.Types
 open PromountApp.Bot.State
 
 type IPage =
-    abstract member OnMassageHandler: UpdateContext -> Command -> Async<IPage>
+    abstract member OnMassageHandler: UpdateContext -> Command -> Async<IPage option>

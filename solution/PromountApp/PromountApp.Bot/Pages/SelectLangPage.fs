@@ -16,12 +16,12 @@ type SelectLangPage(state: UserState, inbox: BotMailbox, next: UserState -> IPag
                     sendMessage state.User.Id (sprintf (Printf.StringFormat<_>(newLang.ChangedLanguageText)) newLang.LangName) ctx
                     inbox.Post(Command.Start, ctx)
                     let newState = { state with Lang = newLang }
-                    return next(newState)
+                    return Some(next(newState))
                 | _ ->
                     match command with
                     | SelectLang ->
                         sendMessageMarkup state.User.Id state.Lang.SelectLanguageText selectLangKeyboard ctx
-                        return this 
+                        return None 
                     | _ ->
-                        return this
+                        return None
             }

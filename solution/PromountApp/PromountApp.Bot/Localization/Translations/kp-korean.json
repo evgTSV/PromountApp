@@ -11,5 +11,15 @@
   "SuccessAuthText": "성공! 귀하의 ID는 %s",
   "ErrorText": "오류: %s",
   "ConsoleHomeText": "<b>%s</b> 를 제어 메뉴에 오신 것을 환영합니다!\n광고 캠페인을 만들고, 편집하고, 추적하세요",
-  "CreateCampaignButtonText": "캠페인 만들기"
+  "CreateCampaignButtonText": "캠페인 생성",
+  "ExitFromAccountButtonText": "로그아웃",
+  "GetCampaignListButton": "내 캠페인",
+  "GetCommonStatsButton": "통계",
+  "BackButton": "뒤로",
+  "ImpressionCountText": "노출 수: ",
+  "ClickCountText": "클릭 수: ",
+  "ConversionText": "전환율: ",
+  "ImpressionSpentText": "노출 비용: ",
+  "ClickSpentText": "클릭 비용: ",
+  "TotalSpentText": "총 비용: "
 }

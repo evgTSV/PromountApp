@@ -11,5 +11,17 @@
   "SuccessAuthText": "Успех! Ваш id - %s",
   "ErrorText": "Ошибка: %s",
   "ConsoleHomeText": "Добро пожаловать <b>%s</b> в меню управления!\nСоздавайте, редактируйте, отслеживайте свои рекламные кампании",
-  "CreateCampaignButtonText": "Создать кампанию"
+  "CreateCampaignButtonText": "Создать кампанию",
+  "ExitFromAccountButtonText": "Выход",
+  "GetCampaignListButton": "Мои кампании",
+  "GetCommonStatsButton": "Статистика",
+  "BackButton": "Назад",
+  "ImpressionCountText": "Количество показов: ",
+  "ClickCountText": "Количество кликов: ",
+  "ConversionText": "Конверсия: ",
+  "ImpressionSpentText": "Потрачено на показы: ",
+  "ClickSpentText": "Потрачено на клики: ",
+  "TotalSpentText": "Потрачено всего: ",
+  "StatsHeaderText": "Общая статистика",
+  "DailyStatsHeaderText": "Статистика за сегодня"
 }
