@@ -31,3 +31,12 @@ datasources:
       interval: Daily
       maxConcurrentShardRequests: 5
       index: "[jaeger-span-]YYYY-MM-DD"
+  - name: PostgreSQL
+    type: postgres
+    url: db:5432
+    database: promountDB
+    user: postgres
+    secureJsonData:
+      password: postgres
+    jsonData:
+      sslmode: "disable"

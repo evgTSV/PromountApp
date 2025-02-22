@@ -1,0 +1,144 @@
+﻿{
+  "id": 1,
+  "type": "timeseries",
+  "title": "Panel Title",
+  "gridPos": {
+    "x": 0,
+    "y": 0,
+    "h": 8,
+    "w": 12
+  },
+  "fieldConfig": {
+    "defaults": {
+      "custom": {
+        "drawStyle": "line",
+        "lineInterpolation": "linear",
+        "barAlignment": 0,
+        "barWidthFactor": 0.6,
+        "lineWidth": 1,
+        "fillOpacity": 0,
+        "gradientMode": "none",
+        "spanNulls": false,
+        "insertNulls": false,
+        "showPoints": "auto",
+        "pointSize": 5,
+        "stacking": {
+          "mode": "none",
+          "group": "A"
+        },
+        "axisPlacement": "auto",
+        "axisLabel": "",
+        "axisColorMode": "text",
+        "axisBorderShow": false,
+        "scaleDistribution": {
+          "type": "linear"
+        },
+        "axisCenteredZero": false,
+        "hideFrom": {
+          "tooltip": false,
+          "viz": false,
+          "legend": false
+        },
+        "thresholdsStyle": {
+          "mode": "off"
+        }
+      },
+      "color": {
+        "mode": "palette-classic"
+      },
+      "mappings": [],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "green",
+            "value": null
+          },
+          {
+            "color": "red",
+            "value": 80
+          }
+        ]
+      }
+    },
+    "overrides": []
+  },
+  "pluginVersion": "11.5.2",
+  "targets": [
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bedsycx27cqgwb"
+      },
+      "editorMode": "code",
+      "format": "table",
+      "hide": false,
+      "rawQuery": true,
+      "rawSql": "SELECT \r\n    c.campaign_id, \r\n    c.advertiser_id, \r\n    SUM(il.cost) AS spent_impressions, \r\n    SUM(cl.cost) AS spent_clicks, \r\n    COUNT(il.id) AS impressions_count, \r\n    COUNT(cl.id) AS clicks_count, \r\n    (COUNT(cl.id) * 100.0 / NULLIF(COUNT(il.id), 0))::float AS conversion\r\nFROM \r\n    \"Campaigns\" c\r\n    LEFT JOIN \"ImpressionLogs\" il ON c.campaign_id = il.campaign_id\r\n    LEFT JOIN \"ClickLogs\" cl ON c.campaign_id = cl.campaign_id\r\nGROUP BY \r\n    c.campaign_id, \r\n    c.advertiser_id;",
+      "refId": "B",
+      "sql": {
+        "columns": [
+          {
+            "parameters": [],
+            "type": "function"
+          }
+        ],
+        "groupBy": [
+          {
+            "property": {
+              "type": "string"
+            },
+            "type": "groupBy"
+          }
+        ],
+        "limit": 50
+      }
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "bedsycx27cqgwb"
+      },
+      "editorMode": "code",
+      "format": "table",
+      "hide": false,
+      "rawQuery": true,
+      "rawSql": "SELECT \r\n    c.campaign_id, \r\n    c.advertiser_id, \r\n    DATE_TRUNC('day', to_timestamp(il.timestamp)) AS date, \r\n    SUM(il.cost) AS spent_impressions, \r\n    SUM(cl.cost) AS spent_clicks, \r\n    COUNT(il.id) AS impressions_count, \r\n    COUNT(cl.id) AS clicks_count, \r\n    (COUNT(cl.id) * 100.0 / NULLIF(COUNT(il.id), 0))::float AS conversion\r\nFROM \r\n    \"Campaigns\" c\r\n    LEFT JOIN \"ImpressionLogs\" il ON c.campaign_id = il.campaign_id\r\n    LEFT JOIN \"ClickLogs\" cl ON c.campaign_id = cl.campaign_id\r\nGROUP BY \r\n    c.campaign_id, \r\n    c.advertiser_id, \r\n    DATE_TRUNC('day', to_timestamp(il.timestamp))\r\nORDER BY \r\n    date;\r\n",
+      "refId": "A",
+      "sql": {
+        "columns": [
+          {
+            "parameters": [],
+            "type": "function"
+          }
+        ],
+        "groupBy": [
+          {
+            "property": {
+              "type": "string"
+            },
+            "type": "groupBy"
+          }
+        ],
+        "limit": 50
+      }
+    }
+  ],
+  "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "bedsycx27cqgwb"
+  },
+  "options": {
+    "tooltip": {
+      "mode": "single",
+      "sort": "none",
+      "hideZeros": false
+    },
+    "legend": {
+      "showLegend": true,
+      "displayMode": "list",
+      "placement": "bottom",
+      "calcs": []
+    }
+  }
+}
