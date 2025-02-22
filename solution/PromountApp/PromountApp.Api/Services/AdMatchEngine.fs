@@ -196,8 +196,7 @@ let getBestCampaign (client: Client) (dbContext: PromountContext, timeService: T
         let commonCampaigns =
             commonCampaigns
             |> Seq.choose (fun bt -> getCampaignStatistics services client bt |> _.Result)
-            |> Seq.filter (snd >> _.out_of_limits_impression >> not)
-            |> Seq.filter (snd >> _.in_ban_list >> not)
+            |> Seq.filter (snd >> (_.out_of_limits_impression >> not |&&| _.in_ban_list >> not))
             |> Seq.map (fun (c, s) -> (c.campaign_id, s))
             |> Seq.fold (fun (acc: Dictionary<_,_>) (key, value) ->
                 acc[key] <- value
