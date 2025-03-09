@@ -33,7 +33,7 @@ type PromountTestContainers() =
     let buildLogger = StringLogger()
     
     let envs =
-        let lines = File.ReadAllLines "/.env"
+        let lines = File.ReadAllLines ".env"
         let dict = Dictionary<string, string>()
         lines
         |> Array.iter (fun x ->
